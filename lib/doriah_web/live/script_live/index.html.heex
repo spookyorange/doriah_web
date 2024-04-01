@@ -1,0 +1,42 @@
+<.header>
+  Listing Scripts
+  <:actions>
+    <.link patch={~p"/scripts/new"}>
+      <.button>New Script</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="scripts"
+  rows={@streams.scripts}
+  row_click={fn {_id, script} -> JS.navigate(~p"/scripts/#{script}") end}
+>
+  <:col :let={{_id, script}} label="Title"><%= script.title %></:col>
+  <:col :let={{_id, script}} label="Description"><%= script.description %></:col>
+  <:action :let={{_id, script}}>
+    <div class="sr-only">
+      <.link navigate={~p"/scripts/#{script}"}>Show</.link>
+    </div>
+    <.link patch={~p"/scripts/#{script}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={{id, script}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: script.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal :if={@live_action in [:new, :edit]} id="script-modal" show on_cancel={JS.patch(~p"/scripts")}>
+  <.live_component
+    module={DoriahWeb.ScriptLive.FormComponent}
+    id={@script.id || :new}
+    title={@page_title}
+    action={@live_action}
+    script={@script}
+    patch={~p"/scripts"}
+  />
+</.modal>

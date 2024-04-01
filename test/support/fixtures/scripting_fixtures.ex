@@ -18,4 +18,19 @@ defmodule Doriah.ScriptingFixtures do
 
     script
   end
+
+  @doc """
+  Generate a script_line.
+  """
+  def script_line_fixture(attrs \\ %{}) do
+    {:ok, script_line} =
+      attrs
+      |> Enum.into(%{
+        line_itself: "some line_itself",
+        order: 42
+      })
+      |> Doriah.Scripting.create_script_line()
+
+    script_line
+  end
 end

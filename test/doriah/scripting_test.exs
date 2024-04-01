@@ -58,4 +58,60 @@ defmodule Doriah.ScriptingTest do
       assert %Ecto.Changeset{} = Scripting.change_script(script)
     end
   end
+
+  describe "script_lines" do
+    alias Doriah.Scripting.ScriptLine
+
+    import Doriah.ScriptingFixtures
+
+    @invalid_attrs %{line_itself: nil, order: nil}
+
+    test "list_script_lines/0 returns all script_lines" do
+      script_line = script_line_fixture()
+      assert Scripting.list_script_lines() == [script_line]
+    end
+
+    test "get_script_line!/1 returns the script_line with given id" do
+      script_line = script_line_fixture()
+      assert Scripting.get_script_line!(script_line.id) == script_line
+    end
+
+    test "create_script_line/1 with valid data creates a script_line" do
+      valid_attrs = %{line_itself: "some line_itself", order: 42}
+
+      assert {:ok, %ScriptLine{} = script_line} = Scripting.create_script_line(valid_attrs)
+      assert script_line.line_itself == "some line_itself"
+      assert script_line.order == 42
+    end
+
+    test "create_script_line/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Scripting.create_script_line(@invalid_attrs)
+    end
+
+    test "update_script_line/2 with valid data updates the script_line" do
+      script_line = script_line_fixture()
+      update_attrs = %{line_itself: "some updated line_itself", order: 43}
+
+      assert {:ok, %ScriptLine{} = script_line} = Scripting.update_script_line(script_line, update_attrs)
+      assert script_line.line_itself == "some updated line_itself"
+      assert script_line.order == 43
+    end
+
+    test "update_script_line/2 with invalid data returns error changeset" do
+      script_line = script_line_fixture()
+      assert {:error, %Ecto.Changeset{}} = Scripting.update_script_line(script_line, @invalid_attrs)
+      assert script_line == Scripting.get_script_line!(script_line.id)
+    end
+
+    test "delete_script_line/1 deletes the script_line" do
+      script_line = script_line_fixture()
+      assert {:ok, %ScriptLine{}} = Scripting.delete_script_line(script_line)
+      assert_raise Ecto.NoResultsError, fn -> Scripting.get_script_line!(script_line.id) end
+    end
+
+    test "change_script_line/1 returns a script_line changeset" do
+      script_line = script_line_fixture()
+      assert %Ecto.Changeset{} = Scripting.change_script_line(script_line)
+    end
+  end
 end

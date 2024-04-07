@@ -50,6 +50,14 @@ window.addEventListener("phx:remove-from-lines", (e) => {
   }
 })
 
+window.addEventListener("phx:copy_to_clipboard", (e) => {
+  const target = document.getElementById(e.detail.id)
+
+  if (target) {
+    navigator.clipboard.writeText(target.textContent.trim())
+  }
+})
+
 // connect if there are any LiveViews on the page
 liveSocket.connect()
 

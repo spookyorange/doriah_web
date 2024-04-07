@@ -16,7 +16,8 @@ defmodule DoriahWeb.ScriptLive.Show do
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
      |> assign(:script, script)
-     |> stream(:script_lines, script.script_lines)}
+     |> stream(:script_lines, script.script_lines)
+     |> assign(:script_sh_url, url(~p"/api/scripts/as_sh/#{script.id}"))}
   end
 
   @impl true
@@ -27,6 +28,16 @@ defmodule DoriahWeb.ScriptLive.Show do
      socket
      |> put_flash(:info, "New line created successfully")
      |> stream_insert(:script_lines, new_script_line)}
+  end
+
+  @impl true
+  def handle_event("copy", %{"id" => id}, socket) do
+    IO.puts(id)
+
+    {:noreply,
+     push_event(socket, "copy_to_clipboard", %{
+       id: id
+     })}
   end
 
   defp page_title(:show), do: "Show Script"

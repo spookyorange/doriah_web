@@ -13,9 +13,39 @@
   <:item title="Description"><%= @script.description %></:item>
 </.list>
 
+<div class="my-8 flex flex-col gap-2">
+  <div id="script_lines" phx-update="stream">
+    <.live_component
+      :for={{dom_id, line} <- @streams.script_lines}
+      module={DoriahWeb.ScriptLive.InteractiveLineComponent}
+      line={line}
+      id={dom_id}
+    />
+  </div>
+
+  <.button class="flex gap-4 justify-center" phx-click="add_line" phx-value-id={@script.id}>
+    Add Line
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke-width="1.5"
+      stroke="currentColor"
+      class="w-6 h-6"
+    >
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+    </svg>
+  </.button>
+</div>
+
 <.back navigate={~p"/scripts"}>Back to scripts</.back>
 
-<.modal :if={@live_action == :edit} id="script-modal" show on_cancel={JS.patch(~p"/scripts/#{@script}")}>
+<.modal
+  :if={@live_action == :edit}
+  id="script-modal"
+  show
+  on_cancel={JS.patch(~p"/scripts/#{@script}")}
+>
   <.live_component
     module={DoriahWeb.ScriptLive.FormComponent}
     id={@script.id}

@@ -4,6 +4,7 @@ defmodule Doriah.Scripting do
   """
 
   import Ecto.Query, warn: false
+  alias Doriah.Scripting.ScriptLine
   alias Doriah.Repo
 
   alias Doriah.Scripting.Script
@@ -36,6 +37,49 @@ defmodule Doriah.Scripting do
 
   """
   def get_script!(id), do: Repo.get!(Script, id)
+
+  @doc """
+  Gets a single script w/lines.
+
+  Raises `Ecto.NoResultsError` if the Script does not exist.
+
+  ## Examples
+
+      iex> get_script_with_lines!(123)
+      %Script{}
+
+      iex> get_script_with_lines!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_script_with_lines!(id) do
+    Repo.get!(Script, id)
+    |> Repo.preload(script_lines: from(l in ScriptLine, order_by: l.order))
+  end
+
+  @doc """
+  Gets a single scripts line count.
+
+  Raises `Ecto.NoResultsError` if the Script does not exist.
+
+  ## Examples
+
+      iex> get_script_lines_max_order!(123)
+      number
+
+      iex> get_script_lines_max_order!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_script_lines_max_order!(id) do
+    Repo.one!(
+      from s in Script,
+        join: l in ScriptLine,
+        on: s.id == l.script_id,
+        where: s.id == ^id,
+        select: max(l.order)
+    )
+  end
 
   @doc """
   Creates a script.
@@ -145,9 +189,13 @@ defmodule Doriah.Scripting do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_script_line(attrs \\ %{}) do
+  def create_associated_blank_script_line(script_id) do
+    script = get_script!(script_id)
+    script_line_max_number = get_script_lines_max_order!(script_id)
+
     %ScriptLine{}
-    |> ScriptLine.changeset(attrs)
+    |> ScriptLine.changeset(%{line_itself: "To be filled", order: script_line_max_number + 1})
+    |> Ecto.Changeset.put_assoc(:script, script)
     |> Repo.insert()
   end
 

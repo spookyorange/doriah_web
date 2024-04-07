@@ -28,9 +28,11 @@ defmodule DoriahWeb.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", DoriahWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", DoriahWeb do
+    pipe_through :api
+
+    get "/scripts/as_sh/:id", ScriptController, :get_script
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:doriah, :dev_routes) do

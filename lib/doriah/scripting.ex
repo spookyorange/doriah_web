@@ -245,4 +245,14 @@ defmodule Doriah.Scripting do
   def change_script_line(%ScriptLine{} = script_line, attrs \\ %{}) do
     ScriptLine.changeset(script_line, attrs)
   end
+
+  def get_script_as_sh_file(id) do
+    script = get_script_with_lines!(id)
+    # we need the lines concatted with \n
+    # Enum.join(script.script_lines, "\n")
+    script.script_lines
+    |> Enum.map(& &1.line_itself)
+    |> Enum.map(&to_string/1)
+    |> Enum.join("\n")
+  end
 end

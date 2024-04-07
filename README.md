@@ -1,5 +1,13 @@
 # Doriah
 
+## Introduction
+
+Manage your scripts easily & more!
+
+Stay tuned for project details.
+
+## Technical
+
 To start your Phoenix server:
 
   * Run `mix setup` to install and setup dependencies

@@ -17,7 +17,8 @@ defmodule DoriahWeb.ScriptLive.Show do
      |> assign(:page_title, page_title(socket.assigns.live_action))
      |> assign(:script, script)
      |> stream(:script_lines, script.script_lines)
-     |> assign(:script_sh_url, url(~p"/api/scripts/as_sh/#{script.id}"))}
+     |> assign(:script_sh_url, url(~p"/api/scripts/as_sh/#{script.id}"))
+     |> assign(:show_import, false)}
   end
 
   @impl true
@@ -32,12 +33,54 @@ defmodule DoriahWeb.ScriptLive.Show do
 
   @impl true
   def handle_event("copy", %{"id" => id}, socket) do
-    IO.puts(id)
-
     {:noreply,
      push_event(socket, "copy_to_clipboard", %{
        id: id
      })}
+  end
+
+  def handle_event("import_from_file_modal_open", _params, socket) do
+    # {:ok, whole_script_with_lines} =
+    #   Scripting.import_multiline_script(socket.assigns.script.id, whole_text_body)
+
+    # {:noreply,
+    #  socket
+    #  |> stream(:script_lines, whole_script_with_lines.script_lines)}
+    {:noreply,
+     socket
+     |> assign(:show_import, true)
+     |> assign(:import_text, "")
+     |> assign(:import_text_height, 2)}
+  end
+
+  def handle_event(
+        "import_from_file_modal_close",
+        _params,
+        socket
+      ) do
+    {:noreply, assign(socket, :show_import, false)}
+  end
+
+  def handle_event(
+        "import_input_change",
+        %{"script_import" => %{"import_textarea" => input_value}},
+        socket
+      ) do
+    {:noreply,
+     socket
+     |> assign(:import_text, input_value)
+     |> assign(:import_text_height, (String.split(input_value, "\n") |> length()) + 1)}
+  end
+
+  def handle_event("submit_import_script", _params, socket) do
+    {:ok, whole_script_with_lines} =
+      Scripting.import_multiline_script(socket.assigns.script.id, socket.assigns.import_text)
+
+    {:noreply,
+     socket
+     |> stream(:script_lines, whole_script_with_lines.script_lines)
+     |> assign(:show_import, false)
+     |> assign(:import_text, "")}
   end
 
   defp page_title(:show), do: "Show Script"

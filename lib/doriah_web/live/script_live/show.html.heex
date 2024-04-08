@@ -36,6 +36,13 @@
       />
     </svg>
   </.button>
+  <.button
+    class="flex gap-4 justify-center"
+    phx-click="import_from_file_modal_open"
+    phx-value-whole-text-body="echo hello world\necho aaaa"
+  >
+    Import from Textarea
+  </.button>
 
   <div id="script_lines" phx-update="stream">
     <.live_component
@@ -62,6 +69,27 @@
 </div>
 
 <.back navigate={~p"/scripts"}>Back to scripts</.back>
+
+<.modal
+  :if={@show_import}
+  id="script-insert-modal"
+  on_cancel={JS.push("import_from_file_modal_close")}
+  show
+>
+  <form phx-submit="submit_import_script" class="flex flex-col gap-4 w-full">
+    <label for="script_import[import_textarea]" class="flex flex-col gap-2">
+      Script to import from
+      <textarea
+        name="script_import[import_textarea]"
+        id="script_import[import_textarea]"
+        phx-change="import_input_change"
+        rows={@import_text_height}
+        class="w-full"
+      />
+    </label>
+    <.button type="submit">Import</.button>
+  </form>
+</.modal>
 
 <.modal
   :if={@live_action == :edit}

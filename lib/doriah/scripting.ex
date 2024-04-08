@@ -72,13 +72,16 @@ defmodule Doriah.Scripting do
 
   """
   def get_script_lines_max_order!(id) do
-    Repo.one!(
-      from s in Script,
-        join: l in ScriptLine,
-        on: s.id == l.script_id,
-        where: s.id == ^id,
-        select: max(l.order)
-    )
+    max_order =
+      Repo.one!(
+        from s in Script,
+          join: l in ScriptLine,
+          on: s.id == l.script_id,
+          where: s.id == ^id,
+          select: max(l.order)
+      )
+
+    max_order || 0
   end
 
   @doc """
@@ -182,11 +185,8 @@ defmodule Doriah.Scripting do
 
   ## Examples
 
-      iex> create_script_line(%{field: value})
+      iex> create_associated_blank_script_line(script_id)
       {:ok, %ScriptLine{}}
-
-      iex> create_script_line(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
 
   """
   def create_associated_blank_script_line(script_id) do
@@ -254,5 +254,30 @@ defmodule Doriah.Scripting do
     |> Enum.map(& &1.line_itself)
     |> Enum.map(&to_string/1)
     |> Enum.join("\n")
+  end
+
+  def import_multiline_script(id, raw_body) do
+    script = get_script!(id)
+    latest_order = get_script_lines_max_order!(id)
+
+    cumulative_script_lines =
+      raw_body
+      |> String.split("\n")
+      |> Enum.with_index(latest_order + 1)
+      |> Enum.map(fn {text, index} ->
+        %{
+          line_itself: text,
+          order: index,
+          script_id: script.id,
+          inserted_at: DateTime.truncate(DateTime.utc_now(), :second),
+          updated_at: DateTime.truncate(DateTime.utc_now(), :second)
+        }
+      end)
+
+    Repo.insert_all(ScriptLine, cumulative_script_lines)
+
+    whole_script_with_lines = get_script_with_lines!(id)
+
+    {:ok, whole_script_with_lines}
   end
 end

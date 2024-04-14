@@ -7,6 +7,7 @@ defmodule Doriah.Scripting.Script do
     field :title, :string
 
     has_many :script_lines, Doriah.Scripting.ScriptLine
+    has_many :script_variables, Doriah.Scripting.ScriptVariable
 
     timestamps(type: :utc_datetime)
   end

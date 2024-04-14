@@ -15,6 +15,6 @@ defmodule Doriah.Scripting.ScriptLine do
   def changeset(script_line, attrs) do
     script_line
     |> cast(attrs, [:line_itself, :order])
-    |> validate_required([:line_itself, :order])
+    |> validate_required([:order])
   end
 end

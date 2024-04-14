@@ -17,6 +17,7 @@ defmodule DoriahWeb.ScriptLive.Show do
      |> assign(:page_title, page_title(socket.assigns.live_action))
      |> assign(:script, script)
      |> stream(:script_lines, script.script_lines)
+     |> stream(:script_variables, script.script_variables)
      |> assign(:script_sh_url, url(~p"/api/scripts/as_sh/#{script.id}"))
      |> assign(:show_import, false)}
   end
@@ -40,12 +41,6 @@ defmodule DoriahWeb.ScriptLive.Show do
   end
 
   def handle_event("import_from_file_modal_open", _params, socket) do
-    # {:ok, whole_script_with_lines} =
-    #   Scripting.import_multiline_script(socket.assigns.script.id, whole_text_body)
-
-    # {:noreply,
-    #  socket
-    #  |> stream(:script_lines, whole_script_with_lines.script_lines)}
     {:noreply,
      socket
      |> assign(:show_import, true)
@@ -85,4 +80,5 @@ defmodule DoriahWeb.ScriptLive.Show do
 
   defp page_title(:show), do: "Show Script"
   defp page_title(:edit), do: "Edit Script"
+  defp page_title(:variables), do: "Manage Variables"
 end

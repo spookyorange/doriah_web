@@ -4,6 +4,7 @@ defmodule Doriah.Scripting do
   """
 
   import Ecto.Query, warn: false
+  alias Doriah.Scripting.ScriptVariable
   alias Doriah.Scripting.ScriptLine
   alias Doriah.Repo
 
@@ -55,6 +56,7 @@ defmodule Doriah.Scripting do
   def get_script_with_lines!(id) do
     Repo.get!(Script, id)
     |> Repo.preload(script_lines: from(l in ScriptLine, order_by: l.order))
+    |> Repo.preload(script_variables: from(v in ScriptVariable, order_by: v.inserted_at))
   end
 
   @doc """
@@ -194,7 +196,7 @@ defmodule Doriah.Scripting do
     script_line_max_number = get_script_lines_max_order!(script_id)
 
     %ScriptLine{}
-    |> ScriptLine.changeset(%{line_itself: "To be filled", order: script_line_max_number + 1})
+    |> ScriptLine.changeset(%{line_itself: "", order: script_line_max_number + 1})
     |> Ecto.Changeset.put_assoc(:script, script)
     |> Repo.insert()
   end
@@ -279,5 +281,115 @@ defmodule Doriah.Scripting do
     whole_script_with_lines = get_script_with_lines!(id)
 
     {:ok, whole_script_with_lines}
+  end
+
+  alias Doriah.Scripting.ScriptVariable
+
+  @doc """
+  Returns the list of script_variables.
+
+  ## Examples
+
+      iex> list_script_variables()
+      [%ScriptVariable{}, ...]
+
+  """
+  def list_script_variables do
+    Repo.all(ScriptVariable)
+  end
+
+  @doc """
+  Returns the list of script_variables of a given script(by id).
+
+  ## Examples
+
+      iex> list_script_variables_of_script(script_id)
+      [%ScriptVariable{}, ...]
+
+  """
+  def list_script_variables_of_script(script_id) do
+    Repo.all(from v in ScriptVariable, where: v.script_id == ^script_id)
+  end
+
+  @doc """
+  Gets a single script_variable.
+
+  Raises `Ecto.NoResultsError` if the Script variable does not exist.
+
+  ## Examples
+
+      iex> get_script_variable!(123)
+      %ScriptVariable{}
+
+      iex> get_script_variable!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_script_variable!(id), do: Repo.get!(ScriptVariable, id)
+
+  @doc """
+  Creates a script_variable.
+
+  ## Examples
+
+      iex> create_script_variable(%{field: value})
+      {:ok, %ScriptVariable{}}
+
+      iex> create_script_variable(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_script_variable(%Script{} = script, attrs \\ %{}) do
+    %ScriptVariable{}
+    |> ScriptVariable.changeset(attrs)
+    |> Ecto.Changeset.put_assoc(:script, script)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a script_variable.
+
+  ## Examples
+
+      iex> update_script_variable(script_variable, %{field: new_value})
+      {:ok, %ScriptVariable{}}
+
+      iex> update_script_variable(script_variable, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_script_variable(%ScriptVariable{} = script_variable, attrs) do
+    script_variable
+    |> ScriptVariable.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a script_variable.
+
+  ## Examples
+
+      iex> delete_script_variable(script_variable)
+      {:ok, %ScriptVariable{}}
+
+      iex> delete_script_variable(script_variable)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_script_variable(%ScriptVariable{} = script_variable) do
+    Repo.delete(script_variable)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking script_variable changes.
+
+  ## Examples
+
+      iex> change_script_variable(script_variable)
+      %Ecto.Changeset{data: %ScriptVariable{}}
+
+  """
+  def change_script_variable(%ScriptVariable{} = script_variable, attrs \\ %{}) do
+    ScriptVariable.changeset(script_variable, attrs)
   end
 end

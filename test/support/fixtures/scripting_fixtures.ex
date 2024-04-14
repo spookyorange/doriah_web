@@ -33,4 +33,20 @@ defmodule Doriah.ScriptingFixtures do
 
     script_line
   end
+
+  @doc """
+  Generate a script_variable.
+  """
+  def script_variable_fixture(attrs \\ %{}) do
+    {:ok, script_variable} =
+      attrs
+      |> Enum.into(%{
+        default_value: "some default_value",
+        key: "some key",
+        purpose: "some purpose"
+      })
+      |> Doriah.Scripting.create_script_variable()
+
+    script_variable
+  end
 end

@@ -23,6 +23,22 @@ defmodule DoriahWeb.ScriptLive.Show do
   end
 
   @impl true
+
+  def handle_event(
+        "delete_variable",
+        %{
+          "deleted-variable-dom-id" => deleted_variable_dom_id,
+          "deleted-variable-self-id" => deleted_variable_self_id
+        },
+        socket
+      ) do
+    script_variable = Scripting.get_script_variable!(deleted_variable_self_id)
+    {:ok, _} = Scripting.delete_script_variable(script_variable)
+
+    {:noreply, socket |> stream_delete_by_dom_id(:script_variables, deleted_variable_dom_id)}
+  end
+
+  @impl true
   def handle_event("add_line", %{"id" => id}, socket) do
     {:ok, new_script_line} = Scripting.create_associated_blank_script_line(id)
 

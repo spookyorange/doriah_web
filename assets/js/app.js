@@ -58,6 +58,22 @@ window.addEventListener("phx:copy_to_clipboard", (e) => {
   }
 })
 
+window.addEventListener("phx:reset-all-inputs-of-a-form", (e) => {
+  const targetForm = document.getElementById(e.detail.id)
+
+  if (targetForm) {
+    const allItsInputs = document.querySelectorAll(`#${e.detail.id} input`)
+
+    allItsInputs.forEach(element => {
+      element.value = ""
+    });
+
+    // then we set the focus to the first input
+
+    allItsInputs[0].focus()
+  }
+})
+
 // connect if there are any LiveViews on the page
 liveSocket.connect()
 

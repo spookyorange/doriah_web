@@ -43,6 +43,14 @@ defmodule DoriahWeb.ScriptLive.Show do
   end
 
   @impl true
+  def handle_info({DoriahWeb.ScriptLive.Variable.CreationForm, {:saved, script_variable}}, socket) do
+    {:noreply,
+     socket
+     |> stream_insert(:script_variables, script_variable)
+     |> push_event("reset-all-inputs-of-a-form", %{id: "script-variable-form"})}
+  end
+
+  @impl true
   def handle_event("add_line", %{"id" => id}, socket) do
     {:ok, new_script_line} = Scripting.create_associated_blank_script_line(id)
 

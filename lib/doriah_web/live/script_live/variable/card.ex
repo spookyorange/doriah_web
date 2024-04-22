@@ -123,7 +123,7 @@ defmodule DoriahWeb.ScriptLive.Variable.Card do
       <span class="w-[150px]">
         <%= String.capitalize(@input_name) %>:
       </span>
-      <p class="overflow-scroll whitespace-nowrap bg-zinc-950 text-white h-6 w-full p-0 border-0 focus:border-b-2 focus:border-white focus:outline-none focus:ring-0">
+      <p class="overflow-auto whitespace-nowrap bg-zinc-950 text-white h-6 w-full p-0 border-0 focus:border-b-2 focus:border-white focus:outline-none focus:ring-0">
         <%= @value %>
       </p>
     </div>

@@ -23,6 +23,19 @@ defmodule DoriahWeb.ScriptLive.Show do
   end
 
   @impl true
+  def handle_info({DoriahWeb.ScriptLive.Variable.Card, {:saved, script_variable}}, socket) do
+    {:noreply, stream_insert(socket, :script_variables, script_variable)}
+  end
+
+  @impl true
+  def handle_info({DoriahWeb.ScriptLive.Variable.CreationForm, {:saved, script_variable}}, socket) do
+    {:noreply,
+     socket
+     |> stream_insert(:script_variables, script_variable)
+     |> push_event("reset-all-inputs-of-a-form", %{id: "script-variable-form"})}
+  end
+
+  @impl true
   def handle_event(
         "delete_variable",
         %{
@@ -38,16 +51,11 @@ defmodule DoriahWeb.ScriptLive.Show do
   end
 
   @impl true
-  def handle_info({DoriahWeb.ScriptLive.Variable.Card, {:saved, script_variable}}, socket) do
-    {:noreply, stream_insert(socket, :script_variables, script_variable)}
-  end
-
-  @impl true
-  def handle_info({DoriahWeb.ScriptLive.Variable.CreationForm, {:saved, script_variable}}, socket) do
+  def handle_event("copy", %{"id" => id}, socket) do
     {:noreply,
-     socket
-     |> stream_insert(:script_variables, script_variable)
-     |> push_event("reset-all-inputs-of-a-form", %{id: "script-variable-form"})}
+     push_event(socket, "copy_to_clipboard", %{
+       id: id
+     })}
   end
 
   @impl true
@@ -58,14 +66,6 @@ defmodule DoriahWeb.ScriptLive.Show do
      socket
      |> put_flash(:info, "New line created successfully")
      |> stream_insert(:script_lines, new_script_line)}
-  end
-
-  @impl true
-  def handle_event("copy", %{"id" => id}, socket) do
-    {:noreply,
-     push_event(socket, "copy_to_clipboard", %{
-       id: id
-     })}
   end
 
   def handle_event("import_from_file_modal_open", _params, socket) do

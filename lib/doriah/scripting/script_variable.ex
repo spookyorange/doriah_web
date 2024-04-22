@@ -17,5 +17,6 @@ defmodule Doriah.Scripting.ScriptVariable do
     script_variable
     |> cast(attrs, [:key, :default_value, :purpose])
     |> validate_required([:key, :default_value, :purpose])
+    |> unique_constraint([:script_id, :key])
   end
 end

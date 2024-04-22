@@ -23,7 +23,6 @@ defmodule DoriahWeb.ScriptLive.Show do
   end
 
   @impl true
-
   def handle_event(
         "delete_variable",
         %{
@@ -36,6 +35,11 @@ defmodule DoriahWeb.ScriptLive.Show do
     {:ok, _} = Scripting.delete_script_variable(script_variable)
 
     {:noreply, socket |> stream_delete_by_dom_id(:script_variables, deleted_variable_dom_id)}
+  end
+
+  @impl true
+  def handle_info({DoriahWeb.ScriptLive.Variable.Card, {:saved, script_variable}}, socket) do
+    {:noreply, stream_insert(socket, :script_variables, script_variable)}
   end
 
   @impl true

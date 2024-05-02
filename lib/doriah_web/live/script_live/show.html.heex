@@ -56,7 +56,7 @@
       phx-value-id={"copy-#{@script.id}"}
       id={"copy-#{@script.id}"}
     >
-      curl <%= @script_sh_url %> | sh
+      curl -s <%= @script_sh_url %> | sh
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"

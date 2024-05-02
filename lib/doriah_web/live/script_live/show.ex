@@ -58,6 +58,14 @@ defmodule DoriahWeb.ScriptLive.Show do
   end
 
   @impl true
+  def handle_info({DoriahWeb.ScriptLive.InteractiveLineComponent, {:updated, line}}, socket) do
+    {:noreply,
+     socket
+     |> put_flash(:info, "Line updated successfully!")
+     |> stream_insert(:script_lines, line)}
+  end
+
+  @impl true
   def handle_info({DoriahWeb.ScriptLive.Variable.Card, {:saved, script_variable}}, socket) do
     {:noreply, stream_insert(socket, :script_variables, script_variable)}
   end

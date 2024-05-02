@@ -40,6 +40,44 @@ defmodule DoriahWeb.ScriptLive.InteractiveLineComponent do
         phx-click="delete_line"
         phx-target={@myself}
       >
+        <span
+          :if={!@edit_mode}
+          title="This icon indicates that this line is up to date!"
+          class="select-none"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+          </svg>
+        </span>
+
+        <span
+          :if={@edit_mode}
+          title="This icon indicates that this line is not updated yet, please change focus!"
+          class="select-none"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636"
+            />
+          </svg>
+        </span>
+
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -76,8 +114,12 @@ defmodule DoriahWeb.ScriptLive.InteractiveLineComponent do
 
   def handle_event("edit_mode_off", %{"value" => value}, socket) do
     # we save it whenever we lose focus
-    Scripting.update_script_line(socket.assigns.line, %{line_itself: value})
+    {:ok, line} = Scripting.update_script_line(socket.assigns.line, %{line_itself: value})
+
+    notify_parent({:updated, line})
 
     {:noreply, assign(socket, edit_mode: false)}
   end
+
+  defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
 end

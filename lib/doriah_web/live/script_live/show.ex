@@ -190,7 +190,7 @@ defmodule DoriahWeb.ScriptLive.Show do
   end
 
   def handle_event("keyup", _, socket) do
-    {:noreply, socket}
+    {:noreply, socket |> escape_controlful_and_keyboarder}
   end
 
   defp controlfulness(socket) do

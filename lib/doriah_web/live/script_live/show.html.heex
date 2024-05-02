@@ -7,28 +7,25 @@
     </.link>
   </:actions>
 </.header>
+<div class="fixed hidden lg:flex flex-col gap-2 lg:items-center w-full max-w-2xl top-4 bg-zinc-800/50 text-white px-8 py-4 text-xl">
+  <div>
+    <%= case {@controlful, @keyboarder} do %>
+      <% {false, false} -> %>
+        <p class="opacity-50">
+          To activate Keyboarder, press CTRL twice!
+        </p>
+      <% {true, false} -> %>
+        <p class="opacity-50">
+          Press CTRL once more to activate Keyboarder(ESC for cancel)
+        </p>
+      <% {_, true} -> %>
+        <p>
+          Press ESC or CTRL to cancel Keyboarder
+        </p>
+    <% end %>
+  </div>
 
-<.list>
-  <:item title="Title"><%= @script.title %></:item>
-  <:item title="Description"><%= @script.description %></:item>
-</.list>
-
-<div class="my-8 flex flex-col gap-2">
-  <.link
-    patch={~p"/scripts/#{@script}/show/variables"}
-    phx-click={JS.push_focus()}
-    class="flex w-full"
-  >
-    <.button class="gap-4 w-full">Manage Variables</.button>
-  </.link>
-
-  <.button
-    class="flex gap-4 justify-center"
-    phx-click="copy"
-    phx-value-id={"copy-#{@script.id}"}
-    id={"copy-#{@script.id}"}
-  >
-    curl <%= @script_sh_url %> | sh
+  <div title="Use Keyboarder to quickly navigate through this page! Some buttons may have a little key underneath them, use them when in Keyboarder mode">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
@@ -40,14 +37,26 @@
       <path
         stroke-linecap="round"
         stroke-linejoin="round"
-        d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184"
+        d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
       />
     </svg>
-  </.button>
+  </div>
+</div>
 
-  <a href={~p"/api/scripts/as_sh_file/#{@script}"} target="_blank" class="flex">
-    <.button id={"download-#{@script.id}"} class="flex w-full justify-center gap-4">
-      Download as .sh file
+<.list>
+  <:item title="Title"><%= @script.title %></:item>
+  <:item title="Description"><%= @script.description %></:item>
+</.list>
+
+<div class="my-8 flex flex-col">
+  <div class="flex mb-2 flex-col gap-2">
+    <.button
+      class="flex gap-4 justify-center"
+      phx-click="copy"
+      phx-value-id={"copy-#{@script.id}"}
+      id={"copy-#{@script.id}"}
+    >
+      curl <%= @script_sh_url %> | sh
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
@@ -59,18 +68,59 @@
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
-          d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
+          d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184"
         />
       </svg>
     </.button>
-  </a>
-  <.button
-    class="flex gap-4 justify-center"
-    phx-click="import_from_file_modal_open"
-    phx-value-whole-text-body="echo hello world\necho aaaa"
+
+    <a href={~p"/api/scripts/as_sh_file/#{@script}"} target="_blank" class="flex">
+      <.button id={"download-#{@script.id}"} class="flex w-full justify-center gap-4">
+        Download as .sh file
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
+          />
+        </svg>
+      </.button>
+    </a>
+  </div>
+  <div
+    class="grid grid-cols-2 gap-1 bg-zinc-900 rounded-lg rounded-b-none"
+    phx-window-keydown="keydown"
+    phx-window-keyup="keyup"
   >
-    Import from Textarea
-  </.button>
+    <.tab_button label="Read" tab_mode={:show} current_mode={@mode} keyboard="r" />
+    <.tab_button label="Edit" tab_mode={:edit} current_mode={@mode} keyboard="e" />
+  </div>
+
+  <%= if @mode === :edit do %>
+    <div class="flex flex-col gap-2 my-2">
+      <.link
+        patch={~p"/scripts/#{@script}/show/variables"}
+        phx-click={JS.push_focus()}
+        class="flex w-full"
+      >
+        <.button class="gap-4 w-full">Manage Variables</.button>
+      </.link>
+
+      <.button
+        class="flex gap-4 justify-center"
+        phx-click="import_from_file_modal_open"
+        phx-value-whole-text-body="echo hello world\necho aaaa"
+      >
+        Import from Textarea
+      </.button>
+    </div>
+  <% end %>
 
   <div id="script_lines" phx-update="stream">
     <.live_component

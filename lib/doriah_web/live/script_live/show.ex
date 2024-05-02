@@ -16,10 +16,40 @@ defmodule DoriahWeb.ScriptLive.Show do
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
      |> assign(:script, script)
+     |> assign(:mode, :show)
      |> stream(:script_lines, script.script_lines)
      |> stream(:script_variables, script.script_variables)
      |> assign(:script_sh_url, url(~p"/api/scripts/as_sh/#{script.id}"))
-     |> assign(:show_import, false)}
+     |> assign(:show_import, false)
+     |> assign(:controlful, false)
+     |> assign(:keyboarder, false)}
+  end
+
+  attr :label, :string, required: true
+  attr :tab_mode, :atom, required: true
+  attr :current_mode, :atom, required: true
+  attr :keyboard, :string, required: false
+
+  def tab_button(assigns) do
+    if assigns.tab_mode === assigns.current_mode do
+      ~H"""
+      <button class="grow p-2 rounded-xl text-white font-regular bg-zinc-700">
+        <p class="underline font-bold"><%= @label %></p>
+        <p class="text-xs hidden lg:block">(<%= @keyboard %>)</p>
+      </button>
+      """
+    else
+      ~H"""
+      <button
+        class="p-2 rounded-xl text-white grow font-regular"
+        phx-value-mode-to-change={assigns.tab_mode}
+        phx-click="change_display_mode"
+      >
+        <p><%= @label %></p>
+        <p class="text-xs hidden lg:block">(<%= @keyboard %>)</p>
+      </button>
+      """
+    end
   end
 
   @impl true
@@ -104,6 +134,54 @@ defmodule DoriahWeb.ScriptLive.Show do
      |> stream(:script_lines, whole_script_with_lines.script_lines)
      |> assign(:show_import, false)
      |> assign(:import_text, "")}
+  end
+
+  def handle_event("change_display_mode", %{"mode-to-change" => mode_to_change}, socket) do
+    {:noreply, socket |> assign(:mode, String.to_atom(mode_to_change))}
+  end
+
+  def handle_event("keydown", %{"key" => "e"}, socket) do
+    if socket.assigns.keyboarder do
+      {:noreply, socket |> assign(:mode, :edit) |> escape_controlful_and_keyboarder}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("keydown", %{"key" => "r"}, socket) do
+    if socket.assigns.keyboarder do
+      {:noreply, socket |> assign(:mode, :show) |> escape_controlful_and_keyboarder}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("keyup", %{"key" => "Control"}, socket) do
+    {:noreply, socket |> controlfulness}
+  end
+
+  def handle_event("keyup", %{"key" => "Escape"}, socket) do
+    {:noreply, socket |> escape_controlful_and_keyboarder}
+  end
+
+  def handle_event("keydown", _, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("keyup", _, socket) do
+    {:noreply, socket}
+  end
+
+  defp controlfulness(socket) do
+    case {socket.assigns.controlful, socket.assigns.keyboarder} do
+      {true, false} -> socket |> assign(:keyboarder, true) |> assign(:controlful, false)
+      {false, false} -> assign(socket, :controlful, true)
+      {_, true} -> assign(socket, :keyboarder, false)
+    end
+  end
+
+  defp escape_controlful_and_keyboarder(socket) do
+    socket |> assign(:keyboarder, false) |> assign(:controlful, false)
   end
 
   defp page_title(:show), do: "Show Script"

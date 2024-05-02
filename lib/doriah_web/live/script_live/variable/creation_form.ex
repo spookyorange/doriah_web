@@ -33,7 +33,6 @@ defmodule DoriahWeb.ScriptLive.Variable.CreationForm do
     case Scripting.create_script_variable(socket.assigns.script, script_variable_params) do
       {:ok, script_variable} ->
         notify_parent({:saved, script_variable})
-        push_event(socket, "set-focus-to-eol", %{hey: "hey"})
 
         {:noreply,
          socket

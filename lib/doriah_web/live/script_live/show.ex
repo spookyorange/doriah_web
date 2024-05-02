@@ -19,11 +19,11 @@ defmodule DoriahWeb.ScriptLive.Show do
      |> assign(:mode, :show)
      |> stream(:script_lines, script.script_lines)
      |> stream(:script_variables, script.script_variables)
+     |> assign(:script_variables, script.script_variables)
      |> assign(:script_sh_url, url(~p"/api/scripts/as_sh/#{script.id}"))
      |> assign(:show_import, false)
      |> assign(:controlful, false)
-     |> assign(:keyboarder, false)
-     |> assign(:virtual_variables, script.script_variables)}
+     |> assign(:keyboarder, false)}
   end
 
   attr :label, :string, required: true
@@ -67,7 +67,9 @@ defmodule DoriahWeb.ScriptLive.Show do
 
   @impl true
   def handle_info({DoriahWeb.ScriptLive.Variable.Card, {:saved, script_variable}}, socket) do
-    {:noreply, stream_insert(socket, :script_variables, script_variable)}
+    {:noreply,
+     stream_insert(socket, :script_variables, script_variable)
+     |> assign(:script_variables, socket.assigns.streams.script_variables)}
   end
 
   @impl true

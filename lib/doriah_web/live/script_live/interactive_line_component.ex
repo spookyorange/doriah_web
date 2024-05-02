@@ -31,7 +31,7 @@ defmodule DoriahWeb.ScriptLive.InteractiveLineComponent do
           :if={@live_action === :show}
           class="overflow-scroll whitespace-nowrap bg-zinc-950 text-white h-6 w-full p-0 border-0 focus:border-b-2 focus:border-white focus:outline-none focus:ring-0"
         >
-          <%= @line.line_itself %>
+          <%= fill_variables(@line.line_itself, @variables) %>
         </p>
       </div>
       <div
@@ -95,6 +95,10 @@ defmodule DoriahWeb.ScriptLive.InteractiveLineComponent do
       </div>
     </div>
     """
+  end
+
+  defp fill_variables(line, vars) do
+    Scripting.fill_line_content_with_variables(line, vars)
   end
 
   def handle_event("edit_mode_on", _value, socket) do

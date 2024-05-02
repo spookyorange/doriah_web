@@ -145,6 +145,39 @@
       </.button>
     </div>
   <% end %>
+  <%= if @live_action === :show do %>
+    <p class="my-2 p-2 bg-zinc-900 text-white flex gap-4 justify-center">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-6 h-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+        />
+      </svg>
+      Lines are prefilled with default variable values in read mode
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-6 h-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+        />
+      </svg>
+    </p>
+  <% end %>
 
   <div id="script_lines" phx-update="stream">
     <.live_component
@@ -153,11 +186,16 @@
       line={line}
       id={dom_id}
       live_action={@live_action}
-      variables={@streams.script_variables}
+      variables={@script_variables}
     />
   </div>
 
-  <.button class="flex gap-4 justify-center" phx-click="add_line" phx-value-id={@script.id}>
+  <.button
+    :if={@live_action === :line_edit_mode}
+    class="flex gap-4 justify-center mt-2"
+    phx-click="add_line"
+    phx-value-id={@script.id}
+  >
     Add Line
     <svg
       xmlns="http://www.w3.org/2000/svg"

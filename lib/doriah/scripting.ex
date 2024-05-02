@@ -392,4 +392,16 @@ defmodule Doriah.Scripting do
   def change_script_variable(%ScriptVariable{} = script_variable, attrs \\ %{}) do
     ScriptVariable.changeset(script_variable, attrs)
   end
+
+  def fill_line_content_with_variables(line_content, variables) do
+    if length(variables) === 0 do
+      line_content
+    else
+      head = hd(variables)
+
+      mutated_line_content = String.replace(line_content, "####{head.key}###", head.default_value)
+
+      fill_line_content_with_variables(mutated_line_content, tl(variables))
+    end
+  end
 end

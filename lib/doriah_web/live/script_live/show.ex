@@ -22,32 +22,37 @@ defmodule DoriahWeb.ScriptLive.Show do
      |> assign(:script_sh_url, url(~p"/api/scripts/as_sh/#{script.id}"))
      |> assign(:show_import, false)
      |> assign(:controlful, false)
-     |> assign(:keyboarder, false)}
+     |> assign(:keyboarder, false)
+     |> assign(:virtual_variables, script.script_variables)}
   end
 
   attr :label, :string, required: true
   attr :tab_mode, :atom, required: true
   attr :current_mode, :atom, required: true
   attr :keyboard, :string, required: false
+  attr :navigate, :string, required: false
 
   def tab_button(assigns) do
     if assigns.tab_mode === assigns.current_mode do
       ~H"""
-      <button class="grow p-2 rounded-xl text-white font-regular bg-zinc-700">
-        <p class="underline font-bold"><%= @label %></p>
-        <p class="text-xs hidden lg:block">(<%= @keyboard %>)</p>
-      </button>
+      <.link
+        patch={@navigate}
+        class="grow p-2 rounded-xl text-white font-regular bg-zinc-700 text-center"
+      >
+        <button>
+          <p class="underline font-bold"><%= @label %></p>
+          <p class="text-xs hidden lg:block">(<%= @keyboard %>)</p>
+        </button>
+      </.link>
       """
     else
       ~H"""
-      <button
-        class="p-2 rounded-xl text-white grow font-regular"
-        phx-value-mode-to-change={assigns.tab_mode}
-        phx-click="change_display_mode"
-      >
-        <p><%= @label %></p>
-        <p class="text-xs hidden lg:block">(<%= @keyboard %>)</p>
-      </button>
+      <.link patch={@navigate} class="p-2 rounded-xl text-white grow font-regular text-center">
+        <button phx-value-mode-to-change={assigns.tab_mode} phx-click="change_display_mode">
+          <p><%= @label %></p>
+          <p class="text-xs hidden lg:block">(<%= @keyboard %>)</p>
+        </button>
+      </.link>
       """
     end
   end
@@ -142,7 +147,10 @@ defmodule DoriahWeb.ScriptLive.Show do
 
   def handle_event("keydown", %{"key" => "e"}, socket) do
     if socket.assigns.keyboarder do
-      {:noreply, socket |> assign(:mode, :edit) |> escape_controlful_and_keyboarder}
+      {:noreply,
+       socket
+       |> push_redirect(to: ~p"/scripts/#{socket.assigns.script.id}/line_edit_mode")
+       |> escape_controlful_and_keyboarder}
     else
       {:noreply, socket}
     end
@@ -150,7 +158,10 @@ defmodule DoriahWeb.ScriptLive.Show do
 
   def handle_event("keydown", %{"key" => "r"}, socket) do
     if socket.assigns.keyboarder do
-      {:noreply, socket |> assign(:mode, :show) |> escape_controlful_and_keyboarder}
+      {:noreply,
+       socket
+       |> push_redirect(to: ~p"/scripts/#{socket.assigns.script.id}")
+       |> escape_controlful_and_keyboarder}
     else
       {:noreply, socket}
     end
@@ -187,4 +198,5 @@ defmodule DoriahWeb.ScriptLive.Show do
   defp page_title(:show), do: "Show Script"
   defp page_title(:edit), do: "Edit Script"
   defp page_title(:variables), do: "Manage Variables"
+  defp page_title(:line_edit_mode), do: "Script Line Edit"
 end

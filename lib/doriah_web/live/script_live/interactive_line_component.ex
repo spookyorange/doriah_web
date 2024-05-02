@@ -13,11 +13,12 @@ defmodule DoriahWeb.ScriptLive.InteractiveLineComponent do
       phx-target={@myself}
       id={"form-line-itself-#{@line.id}"}
     >
-      <div class="flex w-full h-6 align-center">
-        <p class="text-sm font-bold text-zinc-300/70 select-none text-center">
-          <%= @line.order %>-&nbsp;
+      <div class="flex w-full h-6">
+        <p class="text-sm font-bold text-zinc-300/70 select-none text-end mr-2">
+          <%= @line.order %>-
         </p>
         <input
+          :if={@live_action === :line_edit_mode}
           class="overflow-scroll whitespace-nowrap bg-zinc-950 text-white h-6 w-full p-0 border-0 focus:border-b-2 focus:border-white focus:outline-none focus:ring-0"
           value={@line.line_itself}
           type="text"
@@ -26,8 +27,19 @@ defmodule DoriahWeb.ScriptLive.InteractiveLineComponent do
           phx-blur="edit_mode_off"
           phx-target={@myself}
         />
+        <p
+          :if={@live_action === :show}
+          class="overflow-scroll whitespace-nowrap bg-zinc-950 text-white h-6 w-full p-0 border-0 focus:border-b-2 focus:border-white focus:outline-none focus:ring-0"
+        >
+          <%= @line.line_itself %>
+        </p>
       </div>
-      <div class="flex gap-4" phx-click="delete_line" phx-target={@myself}>
+      <div
+        :if={@live_action === :line_edit_mode}
+        class="flex gap-4"
+        phx-click="delete_line"
+        phx-target={@myself}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

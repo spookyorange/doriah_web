@@ -98,11 +98,35 @@
     phx-window-keydown="keydown"
     phx-window-keyup="keyup"
   >
-    <.tab_button label="Read" tab_mode={:show} current_mode={@mode} keyboard="r" />
-    <.tab_button label="Edit" tab_mode={:edit} current_mode={@mode} keyboard="e" />
+    <.tab_button
+      label="Read"
+      tab_mode={:show}
+      current_mode={
+        if @live_action === :line_edit_mode do
+          :edit
+        else
+          :show
+        end
+      }
+      keyboard="r"
+      navigate={"/scripts/#{@script.id}"}
+    />
+    <.tab_button
+      label="Edit"
+      tab_mode={:edit}
+      current_mode={
+        if @live_action === :line_edit_mode do
+          :edit
+        else
+          :show
+        end
+      }
+      keyboard="e"
+      navigate={"/scripts/#{@script.id}/line_edit_mode"}
+    />
   </div>
 
-  <%= if @mode === :edit do %>
+  <%= if @live_action === :line_edit_mode do %>
     <div class="flex flex-col gap-2 my-2">
       <.link
         patch={~p"/scripts/#{@script}/show/variables"}
@@ -128,6 +152,8 @@
       module={DoriahWeb.ScriptLive.InteractiveLineComponent}
       line={line}
       id={dom_id}
+      live_action={@live_action}
+      variables={@streams.script_variables}
     />
   </div>
 
@@ -173,7 +199,7 @@
   :if={@live_action == :variables}
   id="script-variable-modal"
   show
-  on_cancel={JS.patch(~p"/scripts/#{@script}")}
+  on_cancel={JS.patch(~p"/scripts/#{@script}/line_edit_mode")}
 >
   <div>
     <div>

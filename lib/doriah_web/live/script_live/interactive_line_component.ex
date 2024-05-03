@@ -11,12 +11,9 @@ defmodule DoriahWeb.ScriptLive.InteractiveLineComponent do
     <div
       class="flex justify-between gap-4 bg-zinc-950 text-white py-2 px-4"
       phx-target={@myself}
-      id={"form-line-itself-#{@line.id}"}
+      id={@id}
     >
       <div class="flex w-full h-6">
-        <p class="text-sm font-bold text-zinc-300/70 select-none text-end mr-2">
-          <%= @line.order %>-
-        </p>
         <input
           :if={@live_action === :line_edit_mode}
           class="overflow-scroll whitespace-nowrap bg-zinc-950 text-white h-6 w-full p-0 border-0 focus:border-b-2 focus:border-white focus:outline-none focus:ring-0"
@@ -85,6 +82,8 @@ defmodule DoriahWeb.ScriptLive.InteractiveLineComponent do
           stroke-width="1.5"
           stroke="currentColor"
           class="w-6 h-6"
+          phx-click="delete_line"
+          phx-value-deleted-line-id={@line.id}
         >
           <path
             stroke-linecap="round"
@@ -107,13 +106,6 @@ defmodule DoriahWeb.ScriptLive.InteractiveLineComponent do
      |> assign(edit_mode: true)
      |> assign(current_state: socket.assigns.line.line_itself)
      |> push_event("set-focus-to-eol", %{id: "form-line-itself-#{socket.assigns.line.id}"})}
-  end
-
-  def handle_event("delete_line", _value, socket) do
-    Scripting.delete_script_line(socket.assigns.line)
-
-    {:noreply,
-     push_event(socket, "remove-from-lines", %{id: "form-line-itself-#{socket.assigns.line.id}"})}
   end
 
   def handle_event("edit_mode_off", %{"value" => value}, socket) do

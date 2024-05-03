@@ -42,14 +42,6 @@ window.addEventListener("phx:set-focus-to-eol", (e) => {
   }
 })
 
-window.addEventListener("phx:remove-from-lines", (e) => {
-  const target = document.getElementById(e.detail.id)
-
-  if (target) {
-    target.remove()
-  }
-})
-
 window.addEventListener("phx:copy_to_clipboard", (e) => {
   const target = document.getElementById(e.detail.id)
 

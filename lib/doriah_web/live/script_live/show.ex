@@ -95,6 +95,20 @@ defmodule DoriahWeb.ScriptLive.Show do
     {:noreply, socket |> stream_delete_by_dom_id(:script_variables, deleted_variable_dom_id)}
   end
 
+  def handle_event(
+        "delete_line",
+        %{"deleted-line-id" => deleted_line_id},
+        socket
+      ) do
+    line = Scripting.get_script_line!(deleted_line_id)
+    Scripting.delete_script_line(line)
+
+    {:noreply,
+     socket
+     |> stream_delete(:script_lines, line)
+     |> put_flash(:info, "Line deleted successfully!")}
+  end
+
   @impl true
   def handle_event("copy", %{"id" => id}, socket) do
     {:noreply,

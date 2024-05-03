@@ -232,7 +232,17 @@ defmodule Doriah.Scripting do
 
   """
   def delete_script_line(%ScriptLine{} = script_line) do
-    Repo.delete(script_line)
+    Repo.transaction(fn ->
+      Repo.delete(script_line)
+      # we also need to update all the ABOVE ordered ones to match
+      Repo.update_all(
+        from(line in ScriptLine,
+          where: line.script_id == ^script_line.script_id,
+          where: line.order > ^script_line.order
+        ),
+        inc: [order: -1]
+      )
+    end)
   end
 
   @doc """

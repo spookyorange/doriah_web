@@ -48,7 +48,7 @@ defmodule DoriahWeb.ScriptLive.Show do
     else
       ~H"""
       <.link patch={@navigate} class="p-2 rounded-xl text-white grow font-regular text-center">
-        <button phx-value-mode-to-change={assigns.tab_mode} phx-click="change_display_mode">
+        <button phx-value-mode-to-change={assigns.tab_mode}>
           <p><%= @label %></p>
           <p class="text-xs hidden lg:block">(<%= @keyboard %>)</p>
         </button>
@@ -78,6 +78,12 @@ defmodule DoriahWeb.ScriptLive.Show do
      socket
      |> stream_insert(:script_variables, script_variable)
      |> push_event("reset-all-inputs-of-a-form", %{id: "script-variable-form"})}
+  end
+
+  def handle_info({DoriahWeb.ScriptLive.FormComponent, {:saved, script}}, socket) do
+    {:noreply,
+     socket
+     |> assign(:script, script)}
   end
 
   @impl true
@@ -163,10 +169,6 @@ defmodule DoriahWeb.ScriptLive.Show do
      |> stream(:script_lines, whole_script_with_lines.script_lines)
      |> assign(:show_import, false)
      |> assign(:import_text, "")}
-  end
-
-  def handle_event("change_display_mode", %{"mode-to-change" => mode_to_change}, socket) do
-    {:noreply, socket |> assign(:mode, String.to_atom(mode_to_change))}
   end
 
   def handle_event("keydown", %{"key" => "e"}, socket) do

@@ -220,6 +220,17 @@ defmodule DoriahWeb.ScriptLive.Show do
     end
   end
 
+  def handle_event("keydown", %{"key" => "w"}, socket) do
+    if socket.assigns.keyboarder && socket.assigns.live_action == :line_edit_mode do
+      {:noreply,
+       socket
+       |> push_event("focus-on-id-textarea-and-focus-end", %{"id" => "whole_script[itself]"})
+       |> escape_controlful_and_keyboarder}
+    else
+      {:noreply, socket}
+    end
+  end
+
   def handle_event("keydown", %{"key" => "s"}, socket) do
     if socket.assigns.keyboarder && socket.assigns.live_action == :line_edit_mode do
       {:noreply,
@@ -274,7 +285,7 @@ defmodule DoriahWeb.ScriptLive.Show do
         socket
         |> assign(:keyboarder, true)
         |> assign(:controlful, false)
-        |> push_event("focus_keyboarder", %{})
+        |> push_event("focus-keyboarder", %{})
 
       {false, false} ->
         assign(socket, :controlful, true)

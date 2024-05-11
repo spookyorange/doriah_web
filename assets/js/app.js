@@ -66,11 +66,22 @@ window.addEventListener("phx:reset-all-inputs-of-a-form", (e) => {
   }
 })
 
-window.addEventListener("phx:focus_keyboarder", () => {
+window.addEventListener("phx:focus-keyboarder", () => {
   const whole_script = document.getElementById("whole_script[itself]")
 
   if (whole_script) {
     whole_script.blur()
+  }
+})
+
+window.addEventListener("phx:focus-on-id-textarea-and-focus-end", (e) => {
+  const target = document.getElementById(e.detail.id)
+
+  if (target) {
+    const targetValueLength = target.value.length
+    target.focus()
+    target.setSelectionRange(targetValueLength, targetValueLength)
+
   }
 })
 

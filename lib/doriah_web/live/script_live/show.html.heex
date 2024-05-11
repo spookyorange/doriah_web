@@ -204,7 +204,31 @@
         <%= line %>
       </p>
     </div>
-    <form :if={@live_action == :line_edit_mode} phx-submit="save_whole_script" class="w-full">
+    <form
+      :if={@live_action == :line_edit_mode}
+      phx-submit="save_whole_script"
+      class="w-full relative"
+    >
+      <div class="hidden lg:block lg:absolute left-[-60px] top-[2px]">
+        <span class="text-xs">
+          (w)
+        </span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3"
+          />
+        </svg>
+      </div>
+
       <label for="whole_script[itself]">
         <textarea
           class="w-full bg-zinc-900 text-white"
@@ -212,7 +236,7 @@
           id="whole_script[itself]"
           phx-change="whole_script_input_change"
           name="whole_script[itself]"
-        ><%= @whole_script %></textarea>
+        ><%= @whole_script_as_input %></textarea>
       </label>
       <.button class="flex w-full gap-4 justify-center align-center mt-2" type="submit">
         <p class="flex flex-col">

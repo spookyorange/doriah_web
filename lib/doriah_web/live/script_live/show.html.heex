@@ -164,36 +164,49 @@
       </svg>
     </p>
   <% end %>
-
-  <div id="script_lines" phx-update="stream">
-    <.live_component
-      :for={{dom_id, line} <- @streams.script_lines}
-      module={DoriahWeb.ScriptLive.InteractiveLineComponent}
-      line={line}
-      id={dom_id}
-      live_action={@live_action}
-      variables={@script_variables}
-    />
+  <div class="flex">
+    <div :if={@live_action == :show} class="w-full bg-zinc-950 text-white p-4">
+      <p :for={
+        line <-
+          String.split(
+            DoriahWeb.ScriptLive.Show.fill_variables_to_script(@whole_script, @script_variables),
+            "\n"
+          )
+      }>
+        <%= line %>
+      </p>
+    </div>
+    <form :if={@live_action == :line_edit_mode} phx-submit="save_whole_script" class="w-full">
+      <label for="whole_script[itself]">
+        <textarea
+          class="w-full bg-zinc-900 text-white"
+          rows={@whole_script_as_input_height}
+          id="whole_script[itself]"
+          phx-change="whole_script_input_change"
+          name="whole_script[itself]"
+        ><%= @whole_script %></textarea>
+      </label>
+      <.button class="flex w-full gap-4 justify-center align-center mt-2" type="submit">
+        <p class="flex flex-col">
+          Save Changes<span class="hidden lg:block text-sm">(s)</span>
+        </p>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-6 h-6 lg:mt-2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+          />
+        </svg>
+      </.button>
+    </form>
   </div>
-
-  <.button
-    :if={@live_action === :line_edit_mode}
-    class="flex gap-4 justify-center mt-2"
-    phx-click="add_line"
-    phx-value-id={@script.id}
-  >
-    Add Line
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke-width="1.5"
-      stroke="currentColor"
-      class="w-6 h-6"
-    >
-      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-    </svg>
-  </.button>
 </div>
 
 <.back navigate={~p"/scripts"}>Back to scripts</.back>

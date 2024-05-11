@@ -5,6 +5,7 @@ defmodule Doriah.Scripting.Script do
   schema "scripts" do
     field :description, :string
     field :title, :string
+    field :whole_script, :string
 
     has_many :script_lines, Doriah.Scripting.ScriptLine
     has_many :script_variables, Doriah.Scripting.ScriptVariable
@@ -15,7 +16,7 @@ defmodule Doriah.Scripting.Script do
   @doc false
   def changeset(script, attrs) do
     script
-    |> cast(attrs, [:title, :description])
+    |> cast(attrs, [:title, :description, :whole_script])
     |> validate_required([:title, :description])
   end
 end

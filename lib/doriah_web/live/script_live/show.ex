@@ -17,6 +17,13 @@ defmodule DoriahWeb.ScriptLive.Show do
      |> assign(:page_title, page_title(socket.assigns.live_action))
      |> assign(:script, script)
      |> assign(:mode, :show)
+     |> assign(:whole_script, script.whole_script)
+     |> assign(:whole_script_as_input, script.whole_script)
+     |> assign(
+       :whole_script_as_input_height,
+       get_row_count_of_textarea(script.whole_script)
+     )
+     |> assign(:unsaved_changes_for_whole_script, false)
      |> stream(:script_lines, script.script_lines)
      |> stream(:script_variables, script.script_variables)
      |> assign(:script_variables, script.script_variables)
@@ -24,6 +31,10 @@ defmodule DoriahWeb.ScriptLive.Show do
      |> assign(:show_import, false)
      |> assign(:controlful, false)
      |> assign(:keyboarder, false)}
+  end
+
+  defp get_row_count_of_textarea(area_value) do
+    (String.split(area_value, "\n") |> length()) + 1
   end
 
   attr :label, :string, required: true
@@ -123,16 +134,6 @@ defmodule DoriahWeb.ScriptLive.Show do
      })}
   end
 
-  @impl true
-  def handle_event("add_line", %{"id" => id}, socket) do
-    {:ok, new_script_line} = Scripting.create_associated_blank_script_line(id)
-
-    {:noreply,
-     socket
-     |> put_flash(:info, "New line created successfully")
-     |> stream_insert(:script_lines, new_script_line)}
-  end
-
   def handle_event("import_from_file_modal_open", _params, socket) do
     {:noreply,
      socket
@@ -157,16 +158,34 @@ defmodule DoriahWeb.ScriptLive.Show do
     {:noreply,
      socket
      |> assign(:import_text, input_value)
-     |> assign(:import_text_height, (String.split(input_value, "\n") |> length()) + 1)}
+     |> assign(:import_text_height, get_row_count_of_textarea(input_value))}
   end
 
-  def handle_event("submit_import_script", _params, socket) do
-    {:ok, whole_script_with_lines} =
-      Scripting.import_multiline_script(socket.assigns.script.id, socket.assigns.import_text)
+  def handle_event(
+        "whole_script_input_change",
+        %{"whole_script" => %{"itself" => new_value}},
+        socket
+      ) do
+    whole_script_changed = new_value != socket.assigns.whole_script
 
     {:noreply,
      socket
-     |> stream(:script_lines, whole_script_with_lines.script_lines)
+     |> assign(:whole_script_as_input, new_value)
+     |> assign(:whole_script_as_input_height, get_row_count_of_textarea(new_value))
+     |> assign(:unsaved_changes_for_whole_script, whole_script_changed)}
+  end
+
+  def handle_event("save_whole_script", _params, socket) do
+    {:noreply, socket |> save_whole_script}
+  end
+
+  def handle_event("submit_import_script", _params, socket) do
+    {:ok, updated_script} =
+      Scripting.import_sh_script(socket.assigns.script.id, socket.assigns.import_text)
+
+    {:noreply,
+     socket
+     |> assign(:whole_script, updated_script.whole_script)
      |> assign(:show_import, false)
      |> assign(:import_text, "")}
   end
@@ -193,6 +212,17 @@ defmodule DoriahWeb.ScriptLive.Show do
     end
   end
 
+  def handle_event("keydown", %{"key" => "s"}, socket) do
+    if socket.assigns.keyboarder && socket.assigns.live_action == :line_edit_mode do
+      {:noreply,
+       socket
+       |> save_whole_script
+       |> escape_controlful_and_keyboarder}
+    else
+      {:noreply, socket}
+    end
+  end
+
   def handle_event("keyup", %{"key" => "Control"}, socket) do
     {:noreply, socket |> controlfulness}
   end
@@ -209,16 +239,49 @@ defmodule DoriahWeb.ScriptLive.Show do
     {:noreply, socket |> escape_controlful_and_keyboarder}
   end
 
+  def save_whole_script(socket) do
+    if !socket.assigns.unsaved_changes_for_whole_script do
+      socket |> put_flash(:error, "Nothing has changed to save")
+    else
+      {:ok, updated_script} =
+        Scripting.update_script(socket.assigns.script, %{
+          whole_script: socket.assigns.whole_script_as_input
+        })
+
+      socket
+      |> assign(:script, updated_script)
+      |> assign(whole_script: updated_script.whole_script)
+      |> assign(whole_script_as_input: updated_script.whole_script)
+      |> assign(
+        whole_script_as_input_height: get_row_count_of_textarea(updated_script.whole_script)
+      )
+      |> assign(:unsaved_changes_for_whole_script, false)
+      |> put_flash(:info, "Lines saved successfully!")
+    end
+  end
+
   defp controlfulness(socket) do
     case {socket.assigns.controlful, socket.assigns.keyboarder} do
-      {true, false} -> socket |> assign(:keyboarder, true) |> assign(:controlful, false)
-      {false, false} -> assign(socket, :controlful, true)
-      {_, true} -> assign(socket, :keyboarder, false)
+      {true, false} ->
+        socket
+        |> assign(:keyboarder, true)
+        |> assign(:controlful, false)
+        |> push_event("focus_keyboarder", %{})
+
+      {false, false} ->
+        assign(socket, :controlful, true)
+
+      {_, true} ->
+        assign(socket, :keyboarder, false)
     end
   end
 
   defp escape_controlful_and_keyboarder(socket) do
     socket |> assign(:keyboarder, false) |> assign(:controlful, false)
+  end
+
+  def fill_variables_to_script(script, variables) do
+    Scripting.fill_line_content_with_variables(script, variables)
   end
 
   defp page_title(:show), do: "Show Script"

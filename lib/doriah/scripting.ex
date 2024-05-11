@@ -268,29 +268,12 @@ defmodule Doriah.Scripting do
     |> Enum.join("\n")
   end
 
-  def import_multiline_script(id, raw_body) do
+  def import_sh_script(id, raw_body) do
     script = get_script!(id)
-    latest_order = get_script_lines_max_order!(id)
 
-    cumulative_script_lines =
-      raw_body
-      |> String.split("\n")
-      |> Enum.with_index(latest_order + 1)
-      |> Enum.map(fn {text, index} ->
-        %{
-          line_itself: text,
-          order: index,
-          script_id: script.id,
-          inserted_at: DateTime.truncate(DateTime.utc_now(), :second),
-          updated_at: DateTime.truncate(DateTime.utc_now(), :second)
-        }
-      end)
+    {:ok, updated_script} = update_script(script, %{whole_script: raw_body})
 
-    Repo.insert_all(ScriptLine, cumulative_script_lines)
-
-    whole_script_with_lines = get_script_with_lines!(id)
-
-    {:ok, whole_script_with_lines}
+    {:ok, updated_script}
   end
 
   alias Doriah.Scripting.ScriptVariable

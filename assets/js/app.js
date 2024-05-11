@@ -66,6 +66,15 @@ window.addEventListener("phx:reset-all-inputs-of-a-form", (e) => {
   }
 })
 
+window.addEventListener("phx:focus_keyboarder", () => {
+  const whole_script = document.getElementById("whole_script[itself]")
+
+  if (whole_script) {
+    whole_script.blur()
+  }
+})
+
+
 // connect if there are any LiveViews on the page
 liveSocket.connect()
 

@@ -3,7 +3,7 @@ defmodule Doriah.Repo.Migrations.AddWholeScriptLinesToScript do
 
   def change do
     alter table(:scripts) do
-      add :whole_script, :text
+      add :whole_script, :text, default: ""
     end
   end
 end

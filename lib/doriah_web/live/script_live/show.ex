@@ -28,9 +28,10 @@ defmodule DoriahWeb.ScriptLive.Show do
      |> stream(:script_variables, script.script_variables)
      |> assign(:script_variables, script.script_variables)
      |> assign(:script_sh_url, url(~p"/api/scripts/as_sh/#{script.id}"))
-     |> assign(:show_import, false)
      |> assign(:controlful, false)
-     |> assign(:keyboarder, false)}
+     |> assign(:keyboarder, false)
+     |> assign(:import_text, "")
+     |> assign(:import_text_height, 2)}
   end
 
   defp get_row_count_of_textarea(area_value) do
@@ -134,22 +135,6 @@ defmodule DoriahWeb.ScriptLive.Show do
      })}
   end
 
-  def handle_event("import_from_file_modal_open", _params, socket) do
-    {:noreply,
-     socket
-     |> assign(:show_import, true)
-     |> assign(:import_text, "")
-     |> assign(:import_text_height, 2)}
-  end
-
-  def handle_event(
-        "import_from_file_modal_close",
-        _params,
-        socket
-      ) do
-    {:noreply, assign(socket, :show_import, false)}
-  end
-
   def handle_event(
         "import_input_change",
         %{"script_import" => %{"import_textarea" => input_value}},
@@ -159,6 +144,18 @@ defmodule DoriahWeb.ScriptLive.Show do
      socket
      |> assign(:import_text, input_value)
      |> assign(:import_text_height, get_row_count_of_textarea(input_value))}
+  end
+
+  def handle_event("submit_import_script", _params, socket) do
+    {:ok, updated_script} =
+      Scripting.import_sh_script(socket.assigns.script.id, socket.assigns.import_text)
+
+    {:noreply,
+     socket
+     |> assign(:whole_script, updated_script.whole_script)
+     |> assign(:import_text, "")
+     |> put_flash(:info, "Script imported successfully!")
+     |> push_redirect(to: ~p"/scripts/#{socket.assigns.script.id}/line_edit_mode")}
   end
 
   def handle_event(
@@ -179,22 +176,11 @@ defmodule DoriahWeb.ScriptLive.Show do
     {:noreply, socket |> save_whole_script}
   end
 
-  def handle_event("submit_import_script", _params, socket) do
-    {:ok, updated_script} =
-      Scripting.import_sh_script(socket.assigns.script.id, socket.assigns.import_text)
-
-    {:noreply,
-     socket
-     |> assign(:whole_script, updated_script.whole_script)
-     |> assign(:show_import, false)
-     |> assign(:import_text, "")}
-  end
-
   def handle_event("keydown", %{"key" => "e"}, socket) do
     if socket.assigns.keyboarder do
       {:noreply,
        socket
-       |> push_redirect(to: ~p"/scripts/#{socket.assigns.script.id}/line_edit_mode")
+       |> push_redirect(to: ~p"/scripts/#{socket.assigns.script}/line_edit_mode")
        |> escape_controlful_and_keyboarder}
     else
       {:noreply, socket}
@@ -205,7 +191,29 @@ defmodule DoriahWeb.ScriptLive.Show do
     if socket.assigns.keyboarder do
       {:noreply,
        socket
-       |> push_redirect(to: ~p"/scripts/#{socket.assigns.script.id}")
+       |> push_redirect(to: ~p"/scripts/#{socket.assigns.script}")
+       |> escape_controlful_and_keyboarder}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("keydown", %{"key" => "v"}, socket) do
+    if socket.assigns.keyboarder && socket.assigns.live_action == :line_edit_mode do
+      {:noreply,
+       socket
+       |> push_redirect(to: ~p"/scripts/#{socket.assigns.script}/variables")
+       |> escape_controlful_and_keyboarder}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("keydown", %{"key" => "i"}, socket) do
+    if socket.assigns.keyboarder && socket.assigns.live_action == :line_edit_mode do
+      {:noreply,
+       socket
+       |> push_redirect(to: ~p"/scripts/#{socket.assigns.script}/import")
        |> escape_controlful_and_keyboarder}
     else
       {:noreply, socket}
@@ -287,5 +295,6 @@ defmodule DoriahWeb.ScriptLive.Show do
   defp page_title(:show), do: "Show Script"
   defp page_title(:edit), do: "Edit Script"
   defp page_title(:variables), do: "Manage Variables"
+  defp page_title(:import), do: "Import Script"
   defp page_title(:line_edit_mode), do: "Script Line Edit"
 end

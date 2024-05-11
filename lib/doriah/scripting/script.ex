@@ -5,7 +5,7 @@ defmodule Doriah.Scripting.Script do
   schema "scripts" do
     field :description, :string
     field :title, :string
-    field :whole_script, :string
+    field :whole_script, :string, default: ""
 
     has_many :script_lines, Doriah.Scripting.ScriptLine
     has_many :script_variables, Doriah.Scripting.ScriptVariable

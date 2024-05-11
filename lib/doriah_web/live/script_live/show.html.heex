@@ -128,21 +128,49 @@
 
   <%= if @live_action === :line_edit_mode do %>
     <div class="flex flex-col gap-2 my-2">
-      <.link
-        patch={~p"/scripts/#{@script}/show/variables"}
-        phx-click={JS.push_focus()}
-        class="flex w-full"
-      >
-        <.button class="gap-4 w-full">Manage Variables</.button>
+      <.link patch={~p"/scripts/#{@script}/variables"} class="flex w-full">
+        <.button class="flex justify-center gap-4 w-full">
+          <p class="flex flex-col">
+            Manage Variables<span class="hidden lg:block text-xs font-normal">(v)</span>
+          </p>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-6 h-6 lg:mt-2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M4.745 3A23.933 23.933 0 0 0 3 12c0 3.183.62 6.22 1.745 9M19.5 3c.967 2.78 1.5 5.817 1.5 9s-.533 6.22-1.5 9M8.25 8.885l1.444-.89a.75.75 0 0 1 1.105.402l2.402 7.206a.75.75 0 0 0 1.104.401l1.445-.889m-8.25.75.213.09a1.687 1.687 0 0 0 2.062-.617l4.45-6.676a1.688 1.688 0 0 1 2.062-.618l.213.09"
+            />
+          </svg>
+        </.button>
       </.link>
 
-      <.button
-        class="flex gap-4 justify-center"
-        phx-click="import_from_file_modal_open"
-        phx-value-whole-text-body="echo hello world\necho aaaa"
-      >
-        Import from Textarea
-      </.button>
+      <.link patch={~p"/scripts/#{@script}/import"} class="flex w-full">
+        <.button class="flex justify-center gap-4 w-full">
+          <p class="flex flex-col">
+            Import from Textarea <span class="hidden lg:block text-xs font-normal">(i)</span>
+          </p>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-6 h-6 lg:mt-2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"
+            />
+          </svg>
+        </.button>
+      </.link>
     </div>
   <% end %>
   <%= if @live_action === :show do %>
@@ -188,7 +216,7 @@
       </label>
       <.button class="flex w-full gap-4 justify-center align-center mt-2" type="submit">
         <p class="flex flex-col">
-          Save Changes<span class="hidden lg:block text-sm">(s)</span>
+          Save Changes<span class="hidden lg:block text-xs font-normal">(s)</span>
         </p>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -212,12 +240,29 @@
 <.back navigate={~p"/scripts"}>Back to scripts</.back>
 
 <.modal
-  :if={@show_import}
+  :if={@live_action == :import}
   id="script-insert-modal"
-  on_cancel={JS.push("import_from_file_modal_close")}
+  on_cancel={JS.patch(~p"/scripts/#{@script}/line_edit_mode")}
   show
 >
   <form phx-submit="submit_import_script" class="flex flex-col gap-4 w-full">
+    <div class="flex gap-4 justify-center align-center p-4 rounded-xl bg-red-700 text-white">
+      Warning: This will remove all prior lines, use with caution
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-6 h-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
+        />
+      </svg>
+    </div>
     <label for="script_import[import_textarea]" class="flex flex-col gap-2">
       Script to import from
       <textarea
@@ -225,7 +270,7 @@
         id="script_import[import_textarea]"
         phx-change="import_input_change"
         rows={@import_text_height}
-        class="w-full"
+        class="w-full bg-zinc-950 text-white"
       />
     </label>
     <.button type="submit">Import</.button>

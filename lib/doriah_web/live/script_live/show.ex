@@ -73,6 +73,7 @@ defmodule DoriahWeb.ScriptLive.Show do
   def handle_info({DoriahWeb.ScriptLive.InteractiveLineComponent, {:updated, line}}, socket) do
     {:noreply,
      socket
+     |> clear_flash()
      |> put_flash(:info, "Line updated successfully!")
      |> stream_insert(:script_lines, line)}
   end
@@ -124,15 +125,13 @@ defmodule DoriahWeb.ScriptLive.Show do
     {:noreply,
      socket
      |> stream_delete(:script_lines, line)
+     |> clear_flash()
      |> put_flash(:info, "Line deleted successfully!")}
   end
 
   @impl true
-  def handle_event("copy", %{"id" => id}, socket) do
-    {:noreply,
-     push_event(socket, "copy_to_clipboard", %{
-       id: id
-     })}
+  def handle_event("copy", _params, socket) do
+    {:noreply, send_copy_script_link_command(socket)}
   end
 
   def handle_event(
@@ -154,6 +153,7 @@ defmodule DoriahWeb.ScriptLive.Show do
      socket
      |> assign(:whole_script, updated_script.whole_script)
      |> assign(:import_text, "")
+     |> clear_flash()
      |> put_flash(:info, "Script imported successfully!")
      |> push_redirect(to: ~p"/scripts/#{socket.assigns.script.id}/line_edit_mode")}
   end
@@ -174,6 +174,17 @@ defmodule DoriahWeb.ScriptLive.Show do
 
   def handle_event("save_whole_script", _params, socket) do
     {:noreply, socket |> save_whole_script}
+  end
+
+  def handle_event("keydown", %{"key" => "c"}, socket) do
+    if socket.assigns.keyboarder do
+      {:noreply,
+       socket
+       |> send_copy_script_link_command
+       |> escape_controlful_and_keyboarder}
+    else
+      {:noreply, socket}
+    end
   end
 
   def handle_event("keydown", %{"key" => "e"}, socket) do
@@ -260,7 +271,7 @@ defmodule DoriahWeb.ScriptLive.Show do
 
   def save_whole_script(socket) do
     if !socket.assigns.unsaved_changes_for_whole_script do
-      socket |> put_flash(:error, "Nothing has changed to save")
+      socket |> clear_flash() |> put_flash(:error, "Nothing has changed to save")
     else
       {:ok, updated_script} =
         Scripting.update_script(socket.assigns.script, %{
@@ -275,6 +286,7 @@ defmodule DoriahWeb.ScriptLive.Show do
         whole_script_as_input_height: get_row_count_of_textarea(updated_script.whole_script)
       )
       |> assign(:unsaved_changes_for_whole_script, false)
+      |> clear_flash()
       |> put_flash(:info, "Lines saved successfully!")
     end
   end
@@ -297,6 +309,13 @@ defmodule DoriahWeb.ScriptLive.Show do
 
   defp escape_controlful_and_keyboarder(socket) do
     socket |> assign(:keyboarder, false) |> assign(:controlful, false)
+  end
+
+  def send_copy_script_link_command(socket) do
+    socket
+    |> push_event("copy-to-clipboard", %{"id" => "copy-#{socket.assigns.script.id}"})
+    |> clear_flash()
+    |> put_flash(:info, "Copied to clipboard!")
   end
 
   def fill_variables_to_script(script, variables) do

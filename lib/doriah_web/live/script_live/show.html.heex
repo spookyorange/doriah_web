@@ -54,16 +54,17 @@
       class="flex gap-4 justify-center"
       phx-click="copy"
       phx-value-id={"copy-#{@script.id}"}
-      id={"copy-#{@script.id}"}
     >
-      curl -s <%= @script_sh_url %> | sh
+      <p class="flex flex-col">
+        <span id={"copy-#{@script.id}"}>curl -s <%= @script_sh_url %> | sh</span><span class="hidden lg:block text-xs font-normal">(c)</span>
+      </p>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
         stroke-width="1.5"
         stroke="currentColor"
-        class="w-6 h-6"
+        class="w-6 h-6 lg:mt-2"
       >
         <path
           stroke-linecap="round"

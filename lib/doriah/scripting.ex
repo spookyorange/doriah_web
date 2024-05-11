@@ -260,12 +260,8 @@ defmodule Doriah.Scripting do
 
   def get_script_as_sh_file(id) do
     script = get_script_with_lines!(id)
-    # we need the lines concatted with \n
-    # Enum.join(script.script_lines, "\n")
-    script.script_lines
-    |> Enum.map(& &1.line_itself)
-    |> Enum.map(&to_string/1)
-    |> Enum.join("\n")
+
+    fill_line_content_with_variables(script.whole_script, script.script_variables)
   end
 
   def import_sh_script(id, raw_body) do

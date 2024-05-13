@@ -1,5 +1,6 @@
 defmodule DoriahWeb.ScriptLive.Show do
   use DoriahWeb, :live_view
+  use DoriahWeb.BaseUtil.Controlful
 
   alias Doriah.Scripting
 
@@ -290,26 +291,6 @@ defmodule DoriahWeb.ScriptLive.Show do
       |> clear_flash()
       |> put_flash(:info, "Lines saved successfully!")
     end
-  end
-
-  defp controlfulness(socket) do
-    case {socket.assigns.controlful, socket.assigns.keyboarder} do
-      {true, false} ->
-        socket
-        |> assign(:keyboarder, true)
-        |> assign(:controlful, false)
-        |> push_event("focus-keyboarder", %{})
-
-      {false, false} ->
-        assign(socket, :controlful, true)
-
-      {_, true} ->
-        assign(socket, :keyboarder, false)
-    end
-  end
-
-  defp escape_controlful_and_keyboarder(socket) do
-    socket |> assign(:keyboarder, false) |> assign(:controlful, false)
   end
 
   def send_copy_script_link_command(socket) do

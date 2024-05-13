@@ -67,11 +67,7 @@ window.addEventListener("phx:reset-all-inputs-of-a-form", (e) => {
 })
 
 window.addEventListener("phx:focus-keyboarder", () => {
-  const whole_script = document.getElementById("whole_script[itself]")
-
-  if (whole_script) {
-    whole_script.blur()
-  }
+  document.activeElement.blur()
 })
 
 window.addEventListener("phx:focus-on-id-textarea-and-focus-end", (e) => {
@@ -82,9 +78,35 @@ window.addEventListener("phx:focus-on-id-textarea-and-focus-end", (e) => {
     target.focus()
     target.setSelectionRange(targetValueLength, targetValueLength)
 
+    const locator = document.getElementById("whole-script-input-locator")
+
+    if (locator) {
+      locator.scrollIntoView({ behavior: 'smooth' })
+    }
   }
 })
 
+window.addEventListener("phx:get-screen-to-middle-for-editor", () => {
+  const locator = document.getElementById("whole-script[itself]")
+
+  if (locator) {
+    const substr = locator.value.substr(0, locator.selectionStart)
+    const substrLineCount = substr.split("\n").length
+
+    let absoluteTopPositionOfTextarea = 0
+    let node = locator
+    while (node) {
+      absoluteTopPositionOfTextarea += node.offsetTop || 0
+      node = node.offsetParent
+    }
+
+    // each line makes about 24 px with default configs, we dont offer customs now
+    // thing is that the user wants the content from a nice place, when we use the
+    // basic technique of concatting em the topmost line is barely seeable
+    // what im gonna do is give it 5 lines from myself, meaning minus
+    window.scrollTo({ top: absoluteTopPositionOfTextarea - (24 * 5) + substrLineCount * 24, behavior: 'smooth' })
+  }
+})
 
 // connect if there are any LiveViews on the page
 liveSocket.connect()

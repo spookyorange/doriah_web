@@ -85,6 +85,7 @@ defmodule DoriahWeb do
       import Phoenix.HTML
       # Core UI components and translation
       import DoriahWeb.CoreComponents
+      import DoriahWeb.CustomComponents
       import DoriahWeb.Gettext
 
       # Shortcut for generating JS commands

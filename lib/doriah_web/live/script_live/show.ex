@@ -160,7 +160,7 @@ defmodule DoriahWeb.ScriptLive.Show do
 
   def handle_event(
         "whole_script_input_change",
-        %{"whole_script" => %{"itself" => new_value}},
+        %{"whole-script" => %{"itself" => new_value}},
         socket
       ) do
     whole_script_changed = new_value != socket.assigns.whole_script
@@ -169,7 +169,8 @@ defmodule DoriahWeb.ScriptLive.Show do
      socket
      |> assign(:whole_script_as_input, new_value)
      |> assign(:whole_script_as_input_height, get_row_count_of_textarea(new_value))
-     |> assign(:unsaved_changes_for_whole_script, whole_script_changed)}
+     |> assign(:unsaved_changes_for_whole_script, whole_script_changed)
+     |> push_event("get-screen-to-middle-for-editor", %{})}
   end
 
   def handle_event("save_whole_script", _params, socket) do
@@ -235,7 +236,7 @@ defmodule DoriahWeb.ScriptLive.Show do
     if socket.assigns.keyboarder && socket.assigns.live_action == :line_edit_mode do
       {:noreply,
        socket
-       |> push_event("focus-on-id-textarea-and-focus-end", %{"id" => "whole_script[itself]"})
+       |> push_event("focus-on-id-textarea-and-focus-end", %{"id" => "whole-script[itself]"})
        |> escape_controlful_and_keyboarder}
     else
       {:noreply, socket}

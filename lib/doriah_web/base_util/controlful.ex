@@ -26,6 +26,18 @@ defmodule DoriahWeb.BaseUtil.Controlful do
       defp escape_controlful_and_keyboarder(socket) do
         socket |> assign(:keyboarder, false) |> assign(:controlful, false)
       end
+
+      def handle_event("keyup", %{"key" => "Control"}, socket) do
+        {:noreply, socket |> controlfulness}
+      end
+
+      def handle_event("keyup", %{"key" => "Escape"}, socket) do
+        {:noreply, socket |> escape_controlful_and_keyboarder}
+      end
+
+      def handle_event("keyup", _, socket) do
+        {:noreply, socket |> escape_controlful_and_keyboarder}
+      end
     end
   end
 end

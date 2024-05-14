@@ -239,21 +239,7 @@ defmodule DoriahWeb.ScriptLive.Show do
     end
   end
 
-  def handle_event("keyup", %{"key" => "Control"}, socket) do
-    {:noreply, socket |> controlfulness}
-  end
-
-  def handle_event("keyup", %{"key" => "Escape"}, socket) do
-    {:noreply, socket |> escape_controlful_and_keyboarder}
-  end
-
-  def handle_event("keydown", _, socket) do
-    {:noreply, socket}
-  end
-
-  def handle_event("keyup", _, socket) do
-    {:noreply, socket |> escape_controlful_and_keyboarder}
-  end
+  use DoriahWeb.BaseUtil.KeyboardSupport
 
   def save_whole_script(socket) do
     if !socket.assigns.unsaved_changes_for_whole_script do

@@ -108,6 +108,19 @@ window.addEventListener("phx:get-screen-to-middle-for-editor", () => {
   }
 })
 
+window.addEventListener("phx:add-tabindexes-to-scripts", () => {
+  // first we get all the script-* trs
+  const scripts = document.querySelectorAll('[id^="script"]')
+
+  scripts.forEach((script) => {
+    script.setAttribute("tabindex", (script.id.split("-")[1]))
+    script.setAttribute("aa", (script.id.split("-")[1]))
+    console.log(script)
+  })
+
+
+})
+
 // connect if there are any LiveViews on the page
 liveSocket.connect()
 

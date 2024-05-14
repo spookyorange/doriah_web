@@ -1,36 +1,26 @@
 <.header>
-  Listing Scripts
+  Scripts
   <:actions>
-    <.link patch={~p"/scripts/new"}>
-      <.button>New Script</.button>
+    <.link patch={~p"/scripts/new"} tabindex="-1">
+      <.button>
+        <.controlful_indicator_powered_paragraph name="New Script" char="n" />
+      </.button>
     </.link>
   </:actions>
 </.header>
 
-<.table
-  id="scripts"
-  rows={@streams.scripts}
-  row_click={fn {_id, script} -> JS.navigate(~p"/scripts/#{script}") end}
->
-  <:col :let={{_id, script}} label="Title"><%= script.title %></:col>
-  <:col :let={{_id, script}} label="Description"><%= script.description %></:col>
-  <:action :let={{_id, script}}>
-    <div class="sr-only">
-      <.link navigate={~p"/scripts/#{script}"}>Show</.link>
-    </div>
-    <.link patch={~p"/scripts/#{script}/edit"}>Edit</.link>
-  </:action>
-  <:action :let={{id, script}}>
-    <.link
-      phx-click={JS.push("delete", value: %{id: script.id}) |> hide("##{id}")}
-      data-confirm="Are you sure?"
-    >
-      Delete
-    </.link>
-  </:action>
-</.table>
+<.controlful_panel controlful={@controlful} keyboarder={@keyboarder} />
 
-<.modal :if={@live_action in [:new, :edit]} id="script-modal" show on_cancel={JS.patch(~p"/scripts")}>
+<div class="flex flex-col gap-4 mt-8" phx-window-keydown="keydown" phx-window-keyup="keyup">
+  <.script_card :for={script <- @scripts} script={script} />
+</div>
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="script-modal"
+  show
+  on_cancel={JS.patch(~p"/scripts")}
+>
   <.live_component
     module={DoriahWeb.ScriptLive.FormComponent}
     id={@script.id || :new}

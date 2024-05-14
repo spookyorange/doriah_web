@@ -57,7 +57,7 @@ defmodule DoriahWeb.CustomComponents do
 
   def controlful_indicator_powered_paragraph(assigns) do
     ~H"""
-    <p class="flex flex-col">
+    <p class="flex flex-col items-center">
       <%= @name %><.controlful_indicator_span char={@char} />
     </p>
     """

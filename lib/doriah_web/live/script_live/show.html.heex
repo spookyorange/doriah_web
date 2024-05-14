@@ -1,6 +1,14 @@
+<div class="flex mb-4">
+  <.back navigate={~p"/scripts"}>
+    <div>
+      <.controlful_indicator_powered_paragraph name="Back to scripts" char="b" />
+    </div>
+  </.back>
+</div>
+
 <.header>
-  Script <%= @script.id %>
-  <:subtitle>This is a script record from your database.</:subtitle>
+  <%= @script.title %>
+  <:subtitle><%= @script.description %></:subtitle>
   <:actions>
     <.link patch={~p"/scripts/#{@script}/show/edit"} phx-click={JS.push_focus()}>
       <.button>Edit script</.button>
@@ -9,11 +17,6 @@
 </.header>
 
 <.controlful_panel controlful={@controlful} keyboarder={@keyboarder} />
-
-<.list>
-  <:item title="Title"><%= @script.title %></:item>
-  <:item title="Description"><%= @script.description %></:item>
-</.list>
 
 <div class="my-8 flex flex-col">
   <div class="flex mb-2 flex-col gap-2">
@@ -26,39 +29,12 @@
         <span id={"copy-#{@script.id}"}>curl -s <%= @script_sh_url %> | sh</span>
         <.controlful_indicator_span char="c" />
       </p>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="w-6 h-6 lg:mt-2"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184"
-        />
-      </svg>
+      <.icon name="hero-clipboard" class="lg:mt-2" />
     </.button>
 
     <a href={~p"/api/scripts/as_sh_file/#{@script}"} target="_blank" class="flex">
       <.button id={"download-#{@script.id}"} class="flex w-full justify-center gap-4">
-        Download as .sh file
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-6 h-6"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
-          />
-        </svg>
+        Download as .sh file <.icon name="hero-arrow-down-tray" />
       </.button>
     </a>
   </div>
@@ -100,40 +76,14 @@
       <.link patch={~p"/scripts/#{@script}/variables"} class="flex w-full">
         <.button class="flex justify-center gap-4 w-full">
           <.controlful_indicator_powered_paragraph name="Manage Variables" char="v" />
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-6 h-6 lg:mt-2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M4.745 3A23.933 23.933 0 0 0 3 12c0 3.183.62 6.22 1.745 9M19.5 3c.967 2.78 1.5 5.817 1.5 9s-.533 6.22-1.5 9M8.25 8.885l1.444-.89a.75.75 0 0 1 1.105.402l2.402 7.206a.75.75 0 0 0 1.104.401l1.445-.889m-8.25.75.213.09a1.687 1.687 0 0 0 2.062-.617l4.45-6.676a1.688 1.688 0 0 1 2.062-.618l.213.09"
-            />
-          </svg>
+          <.icon name="hero-variable" class="lg:mt-2" />
         </.button>
       </.link>
 
       <.link patch={~p"/scripts/#{@script}/import"} class="flex w-full">
         <.button class="flex justify-center gap-4 w-full">
           <.controlful_indicator_powered_paragraph name="Import" char="i" />
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-6 h-6 lg:mt-2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"
-            />
-          </svg>
+          <.icon name="hero-clipboard-document-list" class="lg:mt-2" />
         </.button>
       </.link>
     </div>
@@ -141,20 +91,7 @@
   <%= if @live_action === :show do %>
     <p class="my-2 p-2 bg-zinc-900 text-white flex gap-4 justify-center">
       Lines are prefilled with default variable values in read mode
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="w-6 h-6"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
-        />
-      </svg>
+      <.icon name="hero-information-circle" />
     </p>
   <% end %>
   <div class="flex">
@@ -174,24 +111,11 @@
       phx-submit="save_whole_script"
       class="w-full relative"
     >
-      <div class="hidden lg:block lg:absolute left-[-60px] top-[2px]">
+      <div class="hidden lg:flex lg:flex-col lg:absolute left-[-60px] top-[2px]">
         <span class="text-xs">
           (w)
         </span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-6 h-6"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3"
-          />
-        </svg>
+        <.icon name="hero-arrow-long-right" />
       </div>
 
       <label for="whole_script[itself]" class="relative">
@@ -210,20 +134,7 @@
       </label>
       <.button class="flex w-full gap-4 justify-center align-center mt-2" type="submit">
         <.controlful_indicator_powered_paragraph name="Save Changes" char="s" />
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-6 h-6 lg:mt-2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-          />
-        </svg>
+        <.icon name="hero-check-circle" class="lg:mt-2" />
       </.button>
     </form>
   </div>
@@ -240,20 +151,7 @@
   <form phx-submit="submit_import_script" class="flex flex-col gap-4 w-full">
     <div class="flex gap-4 justify-center align-center p-4 rounded-xl bg-red-700 text-white">
       Warning: This will remove all prior lines, use with caution
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="w-6 h-6"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
-        />
-      </svg>
+      <.icon name="hero-exclamation-circle" />
     </div>
     <label for="script_import[import_textarea]" class="flex flex-col gap-2">
       Script to import from

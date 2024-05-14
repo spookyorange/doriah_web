@@ -152,6 +152,16 @@ defmodule DoriahWeb.ScriptLive.Show do
     {:noreply, socket |> save_whole_script}
   end
 
+  def handle_event("keydown", %{"key" => "b"}, socket) do
+    if socket.assigns.keyboarder do
+      {:noreply,
+       socket
+       |> push_navigate(to: ~p"/scripts/")}
+    else
+      {:noreply, socket}
+    end
+  end
+
   def handle_event("keydown", %{"key" => "c"}, socket) do
     if socket.assigns.keyboarder do
       {:noreply,

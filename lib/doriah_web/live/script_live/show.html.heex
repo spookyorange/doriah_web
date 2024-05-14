@@ -8,7 +8,7 @@
 
 <.header>
   <%= @script.title %>
-  <:subtitle><%= @script.description %></:subtitle>
+  <:subtitle>Description: <%= @script.description %></:subtitle>
   <:actions>
     <.link patch={~p"/scripts/#{@script}/show/edit"} phx-click={JS.push_focus()}>
       <.button>Edit script</.button>
@@ -139,8 +139,6 @@
     </form>
   </div>
 </div>
-
-<.back navigate={~p"/scripts"}>Back to scripts</.back>
 
 <.modal
   :if={@live_action == :import}

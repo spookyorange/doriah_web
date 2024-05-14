@@ -43,4 +43,23 @@ defmodule DoriahWeb.CustomComponents do
     </div>
     """
   end
+
+  attr :char, :string, required: true
+
+  def controlful_indicator_span(assigns) do
+    ~H"""
+    <span class="hidden lg:block text-xs font-normal">(<%= @char %>)</span>
+    """
+  end
+
+  attr :char, :string, required: true
+  attr :name, :string, required: true
+
+  def controlful_indicator_powered_paragraph(assigns) do
+    ~H"""
+    <p class="flex flex-col">
+      <%= @name %><.controlful_indicator_span char={@char} />
+    </p>
+    """
+  end
 end

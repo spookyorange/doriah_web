@@ -11,7 +11,7 @@ defmodule DoriahWeb.ScriptLive.Show do
 
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
-    script = Scripting.get_script_with_lines!(id)
+    script = Scripting.get_script_with_variables!(id)
 
     {:noreply,
      socket
@@ -25,18 +25,12 @@ defmodule DoriahWeb.ScriptLive.Show do
        get_row_count_of_textarea(script.whole_script)
      )
      |> assign(:unsaved_changes_for_whole_script, false)
-     |> stream(:script_lines, script.script_lines)
      |> stream(:script_variables, script.script_variables)
      |> assign(:script_variables, script.script_variables)
      |> assign(:script_sh_url, url(~p"/api/scripts/as_sh/#{script.id}"))
-     |> assign(:controlful, false)
-     |> assign(:keyboarder, false)
      |> assign(:import_text, "")
-     |> assign(:import_text_height, 2)}
-  end
-
-  defp get_row_count_of_textarea(area_value) do
-    (String.split(area_value, "\n") |> length()) + 1
+     |> assign(:import_text_height, 2)
+     |> assign_controlful()}
   end
 
   attr :label, :string, required: true
@@ -70,13 +64,14 @@ defmodule DoriahWeb.ScriptLive.Show do
     end
   end
 
-  @impl true
-  def handle_info({DoriahWeb.ScriptLive.InteractiveLineComponent, {:updated, line}}, socket) do
+  defp get_row_count_of_textarea(area_value) do
+    (String.split(area_value, "\n") |> length()) + 1
+  end
+
+  def handle_info({DoriahWeb.ScriptLive.FormComponent, {:saved, script}}, socket) do
     {:noreply,
      socket
-     |> clear_flash()
-     |> put_flash(:info, "Line updated successfully!")
-     |> stream_insert(:script_lines, line)}
+     |> assign(:script, script)}
   end
 
   @impl true
@@ -94,12 +89,6 @@ defmodule DoriahWeb.ScriptLive.Show do
      |> push_event("reset-all-inputs-of-a-form", %{id: "script-variable-form"})}
   end
 
-  def handle_info({DoriahWeb.ScriptLive.FormComponent, {:saved, script}}, socket) do
-    {:noreply,
-     socket
-     |> assign(:script, script)}
-  end
-
   @impl true
   def handle_event(
         "delete_variable",
@@ -113,21 +102,6 @@ defmodule DoriahWeb.ScriptLive.Show do
     {:ok, _} = Scripting.delete_script_variable(script_variable)
 
     {:noreply, socket |> stream_delete_by_dom_id(:script_variables, deleted_variable_dom_id)}
-  end
-
-  def handle_event(
-        "delete_line",
-        %{"deleted-line-id" => deleted_line_id},
-        socket
-      ) do
-    line = Scripting.get_script_line!(deleted_line_id)
-    Scripting.delete_script_line(line)
-
-    {:noreply,
-     socket
-     |> stream_delete(:script_lines, line)
-     |> clear_flash()
-     |> put_flash(:info, "Line deleted successfully!")}
   end
 
   @impl true
@@ -289,7 +263,7 @@ defmodule DoriahWeb.ScriptLive.Show do
       )
       |> assign(:unsaved_changes_for_whole_script, false)
       |> clear_flash()
-      |> put_flash(:info, "Lines saved successfully!")
+      |> put_flash(:info, "Script saved successfully!")
     end
   end
 

@@ -3,6 +3,10 @@ defmodule DoriahWeb.BaseUtil.Controlful do
 
   defmacro __using__(_opts) do
     quote do
+      defp assign_controlful(socket) do
+        socket |> assign(:controlful, false) |> assign(:keyboarder, false)
+      end
+
       defp controlfulness(socket) do
         case {socket.assigns.controlful, socket.assigns.keyboarder} do
           {true, false} ->

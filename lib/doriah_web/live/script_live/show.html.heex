@@ -23,7 +23,8 @@
       phx-value-id={"copy-#{@script.id}"}
     >
       <p class="flex flex-col">
-        <span id={"copy-#{@script.id}"}>curl -s <%= @script_sh_url %> | sh</span><span class="hidden lg:block text-xs font-normal">(c)</span>
+        <span id={"copy-#{@script.id}"}>curl -s <%= @script_sh_url %> | sh</span>
+        <.controlful_indicator_span char="c" />
       </p>
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -98,9 +99,7 @@
     <div class="flex flex-col gap-2 my-2">
       <.link patch={~p"/scripts/#{@script}/variables"} class="flex w-full">
         <.button class="flex justify-center gap-4 w-full">
-          <p class="flex flex-col">
-            Manage Variables<span class="hidden lg:block text-xs font-normal">(v)</span>
-          </p>
+          <.controlful_indicator_powered_paragraph name="Manage Variables" char="v" />
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -120,9 +119,7 @@
 
       <.link patch={~p"/scripts/#{@script}/import"} class="flex w-full">
         <.button class="flex justify-center gap-4 w-full">
-          <p class="flex flex-col">
-            Import from Textarea <span class="hidden lg:block text-xs font-normal">(i)</span>
-          </p>
+          <.controlful_indicator_powered_paragraph name="Import" char="i" />
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -212,9 +209,7 @@
         </div>
       </label>
       <.button class="flex w-full gap-4 justify-center align-center mt-2" type="submit">
-        <p class="flex flex-col">
-          Save Changes<span class="hidden lg:block text-xs font-normal">(s)</span>
-        </p>
+        <.controlful_indicator_powered_paragraph name="Save Changes" char="s" />
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

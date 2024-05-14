@@ -40,22 +40,21 @@ defmodule Doriah.Scripting do
   def get_script!(id), do: Repo.get!(Script, id)
 
   @doc """
-  Gets a single script w/lines.
+  Gets a single script w/variables.
 
   Raises `Ecto.NoResultsError` if the Script does not exist.
 
   ## Examples
 
-      iex> get_script_with_lines!(123)
+      iex> get_script_with_variables(123)
       %Script{}
 
-      iex> get_script_with_lines!(456)
+      iex> get_script_with_variables!(456)
       ** (Ecto.NoResultsError)
 
   """
-  def get_script_with_lines!(id) do
+  def get_script_with_variables!(id) do
     Repo.get!(Script, id)
-    |> Repo.preload(script_lines: from(l in ScriptLine, order_by: l.order))
     |> Repo.preload(script_variables: from(v in ScriptVariable, order_by: v.inserted_at))
   end
 
@@ -259,7 +258,7 @@ defmodule Doriah.Scripting do
   end
 
   def get_script_as_sh_file(id) do
-    script = get_script_with_lines!(id)
+    script = get_script_with_variables!(id)
 
     fill_line_content_with_variables(script.whole_script, script.script_variables)
   end

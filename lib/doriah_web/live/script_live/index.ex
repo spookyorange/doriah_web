@@ -36,14 +36,20 @@ defmodule DoriahWeb.ScriptLive.Index do
 
   def script_card(assigns) do
     ~H"""
-    <.link
-      patch={~p"/scripts/#{@script}"}
+    <div
       class="flex justify-between p-4 rounded-xl bg-gray-950 text-white focus-visible:ring-zinc-500 focus-visible:ring-8"
-      tabindex="0"
+      tabindex="-1"
     >
       <%= @script.title %>
+    <.link
+      patch={~p"/scripts/#{@script}"}
+      class="flex align-center gap-2 bg-gray-950 text-white focus-visible:ring-zinc-500 focus-visible:ring-8"
+      tabindex="0"
+    >
+        Visit
       <.icon name="hero-chevron-double-right" />
     </.link>
+    </div>
     """
   end
 

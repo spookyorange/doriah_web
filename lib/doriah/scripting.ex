@@ -257,10 +257,48 @@ defmodule Doriah.Scripting do
     ScriptLine.changeset(script_line, attrs)
   end
 
-  def get_script_as_sh_file(id) do
-    script = get_script_with_variables!(id)
+  def put_list_to_map(list, map \\ %{}) do
+    if length(list) == 0 do
+      map
+    else
+      head = hd(list)
 
-    fill_line_content_with_variables(script.whole_script, script.script_variables)
+      key_name = Map.keys(head) |> hd()
+
+      mutated_map = Map.put(map, key_name, head[key_name])
+
+      put_list_to_map(tl(list), mutated_map)
+    end
+  end
+
+  def get_script_as_sh_file(params) do
+    script = get_script_with_variables!(params["id"])
+
+    other_param_keys = Map.keys(params) |> Enum.filter(fn param_key -> param_key != "id" end)
+
+    variables =
+      standardize_variables(script.script_variables)
+
+    # first we'll need a JUST Map structure that has special values(inevitably)
+    half_baked_variables = put_list_to_map(variables)
+
+    # for customs, we'll do it aggressively, if matches, just override it, doesnt -> create it no problem!
+    other_params_as_list =
+      other_param_keys
+      |> Enum.map(fn param_key ->
+        %{param_key => params[param_key]}
+      end)
+
+    cooked_variables = put_list_to_map(other_params_as_list, half_baked_variables)
+
+    fill_line_content_with_variables(script.whole_script, cooked_variables)
+  end
+
+  def standardize_variables(variables) do
+    variables
+    |> Enum.map(fn variable ->
+      %{variable.key => variable.default_value}
+    end)
   end
 
   def import_sh_script(id, raw_body) do
@@ -382,14 +420,19 @@ defmodule Doriah.Scripting do
   end
 
   def fill_line_content_with_variables(line_content, variables) do
-    if length(variables) === 0 do
+    if length(Map.keys(variables)) === 0 do
       line_content
     else
-      head = hd(variables)
+      all_keys = Map.keys(variables)
 
-      mutated_line_content = String.replace(line_content, "####{head.key}###", head.default_value)
+      head_key = hd(all_keys)
 
-      fill_line_content_with_variables(mutated_line_content, tl(variables))
+      {selected_variable_value, remaining_map} = Map.pop(variables, head_key)
+
+      mutated_line_content =
+        String.replace(line_content, "####{head_key}###", selected_variable_value)
+
+      fill_line_content_with_variables(mutated_line_content, remaining_map)
     end
   end
 end

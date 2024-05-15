@@ -169,7 +169,7 @@ defmodule DoriahWeb.ScriptLive.Show do
   end
 
   def handle_event("save_whole_script", _params, socket) do
-    {:noreply, socket |> save_whole_script}
+    {:noreply, socket |> save_whole_script()}
   end
 
   def handle_event("keydown", %{"key" => "d"}, socket) do
@@ -177,7 +177,7 @@ defmodule DoriahWeb.ScriptLive.Show do
       {:noreply,
        socket
        |> push_redirect(to: ~p"/scripts/#{socket.assigns.script}/show/edit")
-       |> escape_controlful_and_keyboarder}
+       |> escape_controlful_and_keyboarder()}
     else
       {:noreply, socket}
     end
@@ -198,7 +198,7 @@ defmodule DoriahWeb.ScriptLive.Show do
       {:noreply,
        socket
        |> send_copy_script_link_command
-       |> escape_controlful_and_keyboarder}
+       |> escape_controlful_and_keyboarder()}
     else
       {:noreply, socket}
     end
@@ -209,7 +209,7 @@ defmodule DoriahWeb.ScriptLive.Show do
       {:noreply,
        socket
        |> push_redirect(to: ~p"/scripts/#{socket.assigns.script}/line_edit_mode")
-       |> escape_controlful_and_keyboarder}
+       |> escape_controlful_and_keyboarder()}
     else
       {:noreply, socket}
     end
@@ -220,7 +220,7 @@ defmodule DoriahWeb.ScriptLive.Show do
       {:noreply,
        socket
        |> push_redirect(to: ~p"/scripts/#{socket.assigns.script}")
-       |> escape_controlful_and_keyboarder}
+       |> escape_controlful_and_keyboarder()}
     else
       {:noreply, socket}
     end
@@ -231,7 +231,7 @@ defmodule DoriahWeb.ScriptLive.Show do
       {:noreply,
        socket
        |> push_redirect(to: ~p"/scripts/#{socket.assigns.script}/variables")
-       |> escape_controlful_and_keyboarder}
+       |> escape_controlful_and_keyboarder()}
     else
       {:noreply, socket}
     end
@@ -242,7 +242,7 @@ defmodule DoriahWeb.ScriptLive.Show do
       {:noreply,
        socket
        |> push_redirect(to: ~p"/scripts/#{socket.assigns.script}/import")
-       |> escape_controlful_and_keyboarder}
+       |> escape_controlful_and_keyboarder()}
     else
       {:noreply, socket}
     end
@@ -253,7 +253,7 @@ defmodule DoriahWeb.ScriptLive.Show do
       {:noreply,
        socket
        |> push_event("focus-on-id-textarea-and-focus-end", %{"id" => "whole-script[itself]"})
-       |> escape_controlful_and_keyboarder}
+       |> escape_controlful_and_keyboarder()}
     else
       {:noreply, socket}
     end
@@ -263,8 +263,8 @@ defmodule DoriahWeb.ScriptLive.Show do
     if socket.assigns.keyboarder && socket.assigns.live_action == :line_edit_mode do
       {:noreply,
        socket
-       |> save_whole_script
-       |> escape_controlful_and_keyboarder}
+       |> save_whole_script()
+       |> escape_controlful_and_keyboarder()}
     else
       {:noreply, socket}
     end
@@ -302,7 +302,12 @@ defmodule DoriahWeb.ScriptLive.Show do
   end
 
   def fill_variables_to_script(script, variables) do
-    Scripting.fill_line_content_with_variables(script, variables)
+    Scripting.fill_line_content_with_variables(
+      script,
+      variables
+      |> Scripting.standardize_variables()
+      |> Scripting.put_list_to_map()
+    )
   end
 
   defp page_title(:show), do: "Show Script"

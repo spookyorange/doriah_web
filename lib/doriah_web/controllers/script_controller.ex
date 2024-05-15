@@ -2,11 +2,11 @@ defmodule DoriahWeb.ScriptController do
   alias Doriah.Scripting
   use DoriahWeb, :controller
 
-  def get_script(conn, %{"id" => id}) do
-    text(conn, Scripting.get_script_as_sh_file(id))
+  def get_script(conn, params) do
+    text(conn, Scripting.get_script_as_sh_file(params))
   end
 
-  def get_script_download(conn, %{"id" => id}) do
-    send_download(conn, {:binary, Scripting.get_script_as_sh_file(id)}, filename: "script.sh")
+  def get_script_download(conn, params) do
+    send_download(conn, {:binary, Scripting.get_script_as_sh_file(params)}, filename: "script.sh")
   end
 end

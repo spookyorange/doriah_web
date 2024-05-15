@@ -6,7 +6,7 @@ defmodule DoriahWeb.ScriptLive.Show do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, socket}
+    {:ok, socket |> assign_controlful()}
   end
 
   @impl true
@@ -17,20 +17,40 @@ defmodule DoriahWeb.ScriptLive.Show do
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
      |> assign(:script, script)
-     |> assign(:mode, :show)
-     |> assign(:whole_script, script.whole_script)
-     |> assign(:whole_script_as_input, script.whole_script)
-     |> assign(
-       :whole_script_as_input_height,
-       get_row_count_of_textarea(script.whole_script)
-     )
-     |> assign(:unsaved_changes_for_whole_script, false)
-     |> stream(:script_variables, script.script_variables)
-     |> assign(:script_variables, script.script_variables)
      |> assign(:script_sh_url, url(~p"/api/scripts/as_sh/#{script.id}"))
-     |> assign(:import_text, "")
-     |> assign(:import_text_height, 2)
-     |> assign_controlful()}
+     |> apply_action(socket.assigns.live_action, script)}
+  end
+
+  defp apply_action(socket, :line_edit_mode, script) do
+    socket
+    |> assign(:whole_script, script.whole_script)
+    |> assign(:whole_script_as_input, script.whole_script)
+    |> assign(
+      :whole_script_as_input_height,
+      get_row_count_of_textarea(script.whole_script)
+    )
+    |> assign(:unsaved_changes_for_whole_script, false)
+  end
+
+  defp apply_action(socket, :show, script) do
+    socket
+    |> assign(:whole_script, script.whole_script)
+    |> assign(:script_variables, script.script_variables)
+  end
+
+  defp apply_action(socket, :import, _script) do
+    socket
+    |> assign(:import_text, "")
+    |> assign(:import_text_height, 2)
+  end
+
+  defp apply_action(socket, :variables, script) do
+    socket
+    |> stream(:script_variables, script.script_variables)
+  end
+
+  defp apply_action(socket, :edit, _script) do
+    socket
   end
 
   attr :label, :string, required: true
@@ -150,6 +170,17 @@ defmodule DoriahWeb.ScriptLive.Show do
 
   def handle_event("save_whole_script", _params, socket) do
     {:noreply, socket |> save_whole_script}
+  end
+
+  def handle_event("keydown", %{"key" => "d"}, socket) do
+    if socket.assigns.keyboarder do
+      {:noreply,
+       socket
+       |> push_redirect(to: ~p"/scripts/#{socket.assigns.script}/show/edit")
+       |> escape_controlful_and_keyboarder}
+    else
+      {:noreply, socket}
+    end
   end
 
   def handle_event("keydown", %{"key" => "b"}, socket) do

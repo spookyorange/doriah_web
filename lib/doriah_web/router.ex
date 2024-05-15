@@ -25,7 +25,6 @@ defmodule DoriahWeb.Router do
 
     live "/scripts/:id", ScriptLive.Show, :show
     live "/scripts/:id/show/edit", ScriptLive.Show, :edit
-
     live "/scripts/:id/variables", ScriptLive.Show, :variables
     live "/scripts/:id/import", ScriptLive.Show, :import
     live "/scripts/:id/line_edit_mode", ScriptLive.Show, :line_edit_mode

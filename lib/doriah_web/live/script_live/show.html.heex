@@ -11,7 +11,9 @@
   <:subtitle>Description: <%= @script.description %></:subtitle>
   <:actions>
     <.link patch={~p"/scripts/#{@script}/show/edit"} phx-click={JS.push_focus()}>
-      <.button>Edit script</.button>
+      <.button>
+        <.controlful_indicator_powered_paragraph name="Edit script" char="d" />
+      </.button>
     </.link>
   </:actions>
 </.header>

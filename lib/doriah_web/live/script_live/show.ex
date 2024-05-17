@@ -27,37 +27,6 @@ defmodule DoriahWeb.ScriptLive.Show do
     |> assign(:script_variables, script.script_variables)
   end
 
-  attr :label, :string, required: true
-  attr :tab_mode, :atom, required: true
-  attr :current_mode, :atom, required: true
-  attr :keyboard, :string, required: false
-  attr :navigate, :string, required: false
-
-  def tab_button(assigns) do
-    if assigns.tab_mode === assigns.current_mode do
-      ~H"""
-      <.link
-        patch={@navigate}
-        class="grow p-2 rounded-xl text-white font-regular bg-zinc-700 text-center"
-      >
-        <button>
-          <p class="underline font-bold"><%= @label %></p>
-          <p class="text-xs hidden lg:block">(<%= @keyboard %>)</p>
-        </button>
-      </.link>
-      """
-    else
-      ~H"""
-      <.link patch={@navigate} class="p-2 rounded-xl text-white grow font-regular text-center">
-        <button phx-value-mode-to-change={assigns.tab_mode}>
-          <p><%= @label %></p>
-          <p class="text-xs hidden lg:block">(<%= @keyboard %>)</p>
-        </button>
-      </.link>
-      """
-    end
-  end
-
   @impl true
   def handle_event("copy", _params, socket) do
     {:noreply, send_copy_script_link_command(socket)}

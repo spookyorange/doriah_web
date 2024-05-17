@@ -219,8 +219,8 @@ defmodule DoriahWeb.ScriptLive.Edit do
     end
   end
 
-  defp page_title(:edit_mode), do: "Script Edit Mode"
-  defp page_title(:basic_info), do: "Edit Basic Information"
-  defp page_title(:variables), do: "Manage Variables"
-  defp page_title(:import), do: "Import Script"
+  defp page_title(:edit_mode), do: "Script - Edit Mode"
+  defp page_title(:basic_info), do: "Script - Edit Basic Information"
+  defp page_title(:variables), do: "Script - Manage Variables"
+  defp page_title(:import), do: "Script - Import Script"
 end

@@ -17,13 +17,13 @@ defmodule DoriahWeb.ScriptLive.Index do
 
   defp apply_action(socket, :new, _params) do
     socket
-    |> assign(:page_title, "New Script")
+    |> assign(:page_title, "Scripts - Create")
     |> assign(:script, %Script{})
   end
 
   defp apply_action(socket, :index, _params) do
     socket
-    |> assign(:page_title, "Listing Scripts")
+    |> assign(:page_title, "Scripts")
     |> assign(:script, nil)
   end
 
@@ -41,14 +41,13 @@ defmodule DoriahWeb.ScriptLive.Index do
       tabindex="-1"
     >
       <%= @script.title %>
-    <.link
-      patch={~p"/scripts/#{@script}"}
-      class="flex align-center gap-2 bg-gray-950 text-white focus-visible:ring-zinc-500 focus-visible:ring-8"
-      tabindex="0"
-    >
-        Visit
-      <.icon name="hero-chevron-double-right" />
-    </.link>
+      <.link
+        patch={~p"/scripts/#{@script}"}
+        class="flex align-center gap-2 bg-gray-950 text-white focus-visible:ring-zinc-500 focus-visible:ring-8"
+        tabindex="0"
+      >
+        Visit <.icon name="hero-chevron-double-right" />
+      </.link>
     </div>
     """
   end

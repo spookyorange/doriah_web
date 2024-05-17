@@ -11,7 +11,7 @@
 
 <.controlful_panel controlful={@controlful} keyboarder={@keyboarder} />
 
-<div class="flex flex-col gap-4 mt-8" phx-window-keydown="keydown" phx-window-keyup="keyup">
+<div class="flex flex-col gap-4 mt-8">
   <.script_card :for={script <- @scripts} script={script} />
 </div>
 

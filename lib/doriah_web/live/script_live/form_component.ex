@@ -53,7 +53,7 @@ defmodule DoriahWeb.ScriptLive.FormComponent do
     save_script(socket, socket.assigns.action, script_params)
   end
 
-  defp save_script(socket, :edit, script_params) do
+  defp save_script(socket, :basic_info, script_params) do
     case Scripting.update_script(socket.assigns.script, script_params) do
       {:ok, script} ->
         notify_parent({:saved, script})

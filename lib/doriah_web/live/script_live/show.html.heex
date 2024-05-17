@@ -10,9 +10,9 @@
   <%= @script.title %>
   <:subtitle>Description: <%= @script.description %></:subtitle>
   <:actions>
-    <.link patch={~p"/scripts/#{@script}/show/edit"} phx-click={JS.push_focus()}>
+    <.link patch={~p"/scripts/#{@script}/edit_mode"} phx-click={JS.push_focus()}>
       <.button>
-        <.controlful_indicator_powered_paragraph name="Edit script" char="d" />
+        <.controlful_indicator_powered_paragraph name="Edit Mode" char="e" />
       </.button>
     </.link>
   </:actions>
@@ -40,64 +40,13 @@
       </.button>
     </a>
   </div>
-  <div
-    class="grid grid-cols-2 gap-1 bg-zinc-900 rounded-lg rounded-b-none"
-    phx-window-keydown="keydown"
-    phx-window-keyup="keyup"
-  >
-    <.tab_button
-      label="Read"
-      tab_mode={:show}
-      current_mode={
-        if @live_action === :line_edit_mode do
-          :edit
-        else
-          :show
-        end
-      }
-      keyboard="r"
-      navigate={"/scripts/#{@script.id}"}
-    />
-    <.tab_button
-      label="Edit"
-      tab_mode={:edit}
-      current_mode={
-        if @live_action === :line_edit_mode do
-          :edit
-        else
-          :show
-        end
-      }
-      keyboard="e"
-      navigate={"/scripts/#{@script.id}/line_edit_mode"}
-    />
-  </div>
 
-  <%= if @live_action === :line_edit_mode do %>
-    <div class="flex flex-col gap-2 my-2">
-      <.link patch={~p"/scripts/#{@script}/variables"} class="flex w-full">
-        <.button class="flex justify-center gap-4 w-full">
-          <.controlful_indicator_powered_paragraph name="Manage Variables" char="v" />
-          <.icon name="hero-variable" class="lg:mt-2" />
-        </.button>
-      </.link>
-
-      <.link patch={~p"/scripts/#{@script}/import"} class="flex w-full">
-        <.button class="flex justify-center gap-4 w-full">
-          <.controlful_indicator_powered_paragraph name="Import" char="i" />
-          <.icon name="hero-clipboard-document-list" class="lg:mt-2" />
-        </.button>
-      </.link>
-    </div>
-  <% end %>
-  <%= if @live_action === :show do %>
-    <p class="my-2 p-2 bg-zinc-900 text-white flex gap-4 justify-center">
-      Lines are prefilled with default variable values in read mode
-      <.icon name="hero-information-circle" />
-    </p>
-  <% end %>
+  <p class="mb-2 p-2 bg-zinc-900 text-white flex gap-4 justify-center">
+    Lines are prefilled with default variable values in read mode
+    <.icon name="hero-information-circle" />
+  </p>
   <div class="flex">
-    <div :if={@live_action == :show} class="w-full bg-zinc-950 text-white p-4">
+    <div class="w-full bg-zinc-950 text-white p-4">
       <p :for={
         line <-
           String.split(
@@ -108,109 +57,5 @@
         <%= line %>
       </p>
     </div>
-    <form
-      :if={@live_action == :line_edit_mode}
-      phx-submit="save_whole_script"
-      class="w-full relative"
-    >
-      <div class="hidden lg:flex lg:flex-col lg:absolute left-[-60px] top-[2px]">
-        <span class="text-xs">
-          (w)
-        </span>
-        <.icon name="hero-arrow-long-right" />
-      </div>
-
-      <label for="whole_script[itself]" class="relative">
-        <textarea
-          class="w-full bg-zinc-900 text-white"
-          rows={@whole_script_as_input_height}
-          id="whole-script[itself]"
-          phx-change="whole_script_input_change"
-          name="whole-script[itself]"
-        ><%= @whole_script_as_input %></textarea>
-        <div
-          id="whole-script-input-locator"
-          class={"absolute top-[#{(@whole_script_as_input_height * 8) + 16}px]"}
-        >
-        </div>
-      </label>
-      <.button class="flex w-full gap-4 justify-center align-center mt-2" type="submit">
-        <.controlful_indicator_powered_paragraph name="Save Changes" char="s" />
-        <.icon name="hero-check-circle" class="lg:mt-2" />
-      </.button>
-    </form>
   </div>
 </div>
-
-<.modal
-  :if={@live_action == :import}
-  id="script-insert-modal"
-  on_cancel={JS.patch(~p"/scripts/#{@script}/line_edit_mode")}
-  show
->
-  <form phx-submit="submit_import_script" class="flex flex-col gap-4 w-full">
-    <div class="flex gap-4 justify-center align-center p-4 rounded-xl bg-red-700 text-white">
-      Warning: This will remove all prior lines, use with caution
-      <.icon name="hero-exclamation-circle" />
-    </div>
-    <label for="script_import[import_textarea]" class="flex flex-col gap-2">
-      Script to import from
-      <textarea
-        name="script_import[import_textarea]"
-        id="script_import[import_textarea]"
-        phx-change="import_input_change"
-        rows={@import_text_height}
-        class="w-full bg-zinc-950 text-white"
-      />
-    </label>
-    <.button type="submit">Import</.button>
-  </form>
-</.modal>
-
-<.modal
-  :if={@live_action == :variables}
-  id="script-variable-modal"
-  show
-  on_cancel={JS.patch(~p"/scripts/#{@script}/line_edit_mode")}
->
-  <div>
-    <div>
-      <.header>
-        Variable Management
-        <:subtitle>Create, update, delete variables for your Script here.</:subtitle>
-      </.header>
-
-      <.live_component
-        module={DoriahWeb.ScriptLive.Variable.CreationForm}
-        id={"script-variable-creation-#{@script.id}"}
-        script={@script}
-      />
-      <div class="mt-4 flex flex-col gap-4" id="script_variables" phx-update="stream">
-        <div :for={{dom_id, variable} <- @streams.script_variables} id={dom_id}>
-          <.live_component
-            module={DoriahWeb.ScriptLive.Variable.Card}
-            variable={variable}
-            dom_id={dom_id}
-            id={"orangesaregood-#{dom_id}"}
-          />
-        </div>
-      </div>
-    </div>
-  </div>
-</.modal>
-
-<.modal
-  :if={@live_action == :edit}
-  id="script-modal"
-  show
-  on_cancel={JS.patch(~p"/scripts/#{@script}")}
->
-  <.live_component
-    module={DoriahWeb.ScriptLive.FormComponent}
-    id={@script.id}
-    title={@page_title}
-    action={@live_action}
-    script={@script}
-    patch={~p"/scripts/#{@script}"}
-  />
-</.modal>

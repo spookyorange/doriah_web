@@ -21,13 +21,15 @@ defmodule DoriahWeb.Router do
 
     live "/scripts", ScriptLive.Index, :index
     live "/scripts/new", ScriptLive.Index, :new
-    live "/scripts/:id/edit", ScriptLive.Index, :edit
 
     live "/scripts/:id", ScriptLive.Show, :show
-    live "/scripts/:id/show/edit", ScriptLive.Show, :edit
-    live "/scripts/:id/variables", ScriptLive.Show, :variables
-    live "/scripts/:id/import", ScriptLive.Show, :import
-    live "/scripts/:id/line_edit_mode", ScriptLive.Show, :line_edit_mode
+
+    live "/scripts/:id/show/variable_loadout", ScriptLive.Show, :variable_loadout
+
+    live "/scripts/:id/edit_mode", ScriptLive.Edit, :edit_mode
+    live "/scripts/:id/edit_mode/variables", ScriptLive.Edit, :variables
+    live "/scripts/:id/edit_mode/import", ScriptLive.Edit, :import
+    live "/scripts/:id/edit_mode/basic_info", ScriptLive.Edit, :basic_info
   end
 
   # Other scopes may use custom stacks.

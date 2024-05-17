@@ -6,7 +6,11 @@ defmodule DoriahWeb.CustomComponents do
 
   def controlful_panel(assigns) do
     ~H"""
-    <div class="fixed hidden lg:flex flex-col gap-2 lg:items-center w-full max-w-2xl top-4 bg-zinc-800/50 text-white px-8 py-4 text-xl">
+    <div
+      class="fixed hidden lg:flex flex-col gap-2 lg:items-center w-full max-w-2xl top-4 bg-zinc-800/50 text-white px-8 py-4 text-xl z-[51]"
+      phx-window-keydown="keydown"
+      phx-window-keyup="keyup"
+    >
       <div>
         <%= case {@controlful, @keyboarder} do %>
           <% {false, false} -> %>

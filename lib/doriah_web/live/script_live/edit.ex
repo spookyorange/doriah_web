@@ -2,6 +2,7 @@ defmodule DoriahWeb.ScriptLive.Edit do
   use DoriahWeb, :live_view
   use DoriahWeb.BaseUtil.Controlful
 
+  import DoriahWeb.ScriptLive.Variable.Index
   alias Doriah.Scripting
 
   @impl true

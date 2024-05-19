@@ -291,7 +291,7 @@ defmodule Doriah.Scripting do
 
     cooked_variables = put_list_to_map(other_params_as_list, half_baked_variables)
 
-    fill_line_content_with_variables(script.whole_script, cooked_variables)
+    fill_content_with_variables(script.whole_script, cooked_variables)
   end
 
   def standardize_variables(variables) do
@@ -419,9 +419,17 @@ defmodule Doriah.Scripting do
     ScriptVariable.changeset(script_variable, attrs)
   end
 
-  def fill_line_content_with_variables(line_content, variables) do
+  @doc """
+  Return the `content` with filled variables
+
+  ## Examples
+
+      iex > fill_content_with_variables(content, variables)
+      "filled content"
+  """
+  def fill_content_with_variables(content, variables) do
     if length(Map.keys(variables)) === 0 do
-      line_content
+      content
     else
       all_keys = Map.keys(variables)
 
@@ -429,10 +437,10 @@ defmodule Doriah.Scripting do
 
       {selected_variable_value, remaining_map} = Map.pop(variables, head_key)
 
-      mutated_line_content =
-        String.replace(line_content, "####{head_key}###", selected_variable_value)
+      mutated_content =
+        String.replace(content, "####{head_key}###", selected_variable_value)
 
-      fill_line_content_with_variables(mutated_line_content, remaining_map)
+      fill_content_with_variables(mutated_content, remaining_map)
     end
   end
 end

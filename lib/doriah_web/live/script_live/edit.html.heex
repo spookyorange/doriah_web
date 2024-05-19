@@ -7,7 +7,7 @@
 </div>
 
 <.header>
-  <%= @script.title %>
+  <%= @script.title %> - Edit
   <:subtitle>Description: <%= @script.description %></:subtitle>
   <:actions>
     <.link patch={~p"/scripts/#{@script}/edit_mode/basic_info"} phx-click={JS.push_focus()}>

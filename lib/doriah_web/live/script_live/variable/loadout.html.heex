@@ -1,0 +1,87 @@
+<div class="flex mb-4">
+  <.back navigate={~p"/scripts/#{@script}"}>
+    <div>
+      <.controlful_indicator_powered_paragraph name="Back to preview" char="b" />
+    </div>
+  </.back>
+</div>
+
+<.header>
+  <%= @script.title %> - Variable Loadout Management
+  <:subtitle>Manage loadouts</:subtitle>
+</.header>
+
+<.controlful_panel controlful={@controlful} keyboarder={@keyboarder} />
+
+<div class="my-8 flex flex-col">
+  <div class="flex flex-col gap-4">
+    <h3 class="text-xl font-medium">
+      Currently applied loadout:
+      <span class="font-extrabold"><%= @currently_applied_loadout_title %></span>
+    </h3>
+
+    <div class="flex flex-col border-2 border-black p-2">
+      <h3 class="text-xl underline my-2">
+        Applied Variables
+      </h3>
+      <form
+        class="flex flex-col gap-4 my-2 overflow w-full"
+        phx-submit="apply_variables_from_ram_to_current"
+        phx-change="save_variable_changes_to_ram"
+      >
+        <div
+          :for={variable <- @current_variables_in_ram}
+          class="flex p-2 bg-zinc-900 text-white rounded-md w-full"
+        >
+          <input
+            class="grow ml-2 bg-zinc-900 text-center"
+            name={"key[#{variable.index}]"}
+            value={"#{variable.key}"}
+          />
+          <span>------></span>
+          <input
+            class="grow ml-2 bg-zinc-900 text-center"
+            name={"value[#{variable.index}]"}
+            value={"#{variable.value}"}
+          />
+        </div>
+
+        <.button
+          :if={length(@current_variables_in_ram) > 0}
+          class="flex gap-2 justify-center align-center"
+          type="submit"
+        >
+          Apply Them
+        </.button>
+        <.button
+          class="flex gap-2 justify-center align-center"
+          phx-click="create_new_variable"
+          type="button"
+        >
+          Add Variable <.icon name="hero-plus" />
+        </.button>
+      </form>
+    </div>
+
+    <div class="w-full bg-zinc-950 text-white p-4">
+      <p :for={
+        line <-
+          String.split(
+            apply_variables_to_script(@whole_script, @currently_applied_variables),
+            "\n"
+          )
+      }>
+        <%= line %>
+      </p>
+    </div>
+  </div>
+</div>
+
+<.modal
+  :if={@live_action == :variables}
+  id="script-variable-modal"
+  show
+  on_cancel={JS.patch(~p"/scripts/#{@script}/edit_mode")}
+>
+  <.script_variable_dashboard script={@script} variable_stream={@streams.script_variables} />
+</.modal>

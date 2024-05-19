@@ -18,13 +18,18 @@ defmodule DoriahWeb.ScriptLive.Show do
      |> assign(:page_title, page_title(socket.assigns.live_action))
      |> assign(:script, script)
      |> assign(:script_sh_url, url(~p"/api/scripts/as_sh/#{script.id}"))
+     |> assign(:whole_script, script.whole_script)
+     |> assign(:script_variables, script.script_variables)
      |> apply_action(socket.assigns.live_action, script)}
   end
 
-  defp apply_action(socket, :show, script) do
+  defp apply_action(socket, :show, _script) do
     socket
-    |> assign(:whole_script, script.whole_script)
-    |> assign(:script_variables, script.script_variables)
+  end
+
+  defp apply_action(socket, :variable_loadout, script) do
+    socket
+    |> assign(:local_variables, script.script_variables)
   end
 
   @impl true
@@ -37,6 +42,17 @@ defmodule DoriahWeb.ScriptLive.Show do
       {:noreply,
        socket
        |> push_redirect(to: ~p"/scripts/#{socket.assigns.script}/edit_mode")
+       |> escape_controlful_and_keyboarder()}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("keydown", %{"key" => "v"}, socket) do
+    if socket.assigns.keyboarder && socket.assigns.live_action == :show do
+      {:noreply,
+       socket
+       |> push_redirect(to: ~p"/scripts/#{socket.assigns.script}/variable_loadout")
        |> escape_controlful_and_keyboarder()}
     else
       {:noreply, socket}
@@ -74,7 +90,7 @@ defmodule DoriahWeb.ScriptLive.Show do
   end
 
   def fill_variables_to_script(script, variables) do
-    Scripting.fill_line_content_with_variables(
+    Scripting.fill_content_with_variables(
       script,
       variables
       |> Scripting.standardize_variables()

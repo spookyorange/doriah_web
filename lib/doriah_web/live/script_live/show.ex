@@ -27,11 +27,6 @@ defmodule DoriahWeb.ScriptLive.Show do
     socket
   end
 
-  defp apply_action(socket, :variable_loadout, script) do
-    socket
-    |> assign(:local_variables, script.script_variables)
-  end
-
   @impl true
   def handle_event("copy", _params, socket) do
     {:noreply, send_copy_script_link_command(socket)}

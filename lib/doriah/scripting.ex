@@ -277,12 +277,6 @@ defmodule Doriah.Scripting do
 
     other_param_keys = Map.keys(params) |> Enum.filter(fn param_key -> param_key != "id" end)
 
-    variables =
-      standardize_variables(script.script_variables)
-
-    # first we'll need a JUST Map structure that has special values(inevitably)
-    half_baked_variables = put_list_to_map(variables)
-
     # for customs, we'll do it aggressively, if matches, just override it, doesnt -> create it no problem!
     other_params_as_list =
       other_param_keys
@@ -290,7 +284,7 @@ defmodule Doriah.Scripting do
         %{param_key => params[param_key]}
       end)
 
-    cooked_variables = put_list_to_map(other_params_as_list, half_baked_variables)
+    cooked_variables = put_list_to_map(other_params_as_list)
 
     fill_content_with_variables(script.whole_script, cooked_variables)
   end

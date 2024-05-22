@@ -54,7 +54,7 @@
           phx-value-type="wget"
         >
           <p class="flex flex-col">
-            <span id={"copy-#{@script.id}-wget"} value={"wget -qO- #{@script_sh_url}"}>
+            <span id={"copy-#{@script.id}-wget"} value={"wget -qO- #{@script_sh_url} | sh"}>
               as wget
             </span>
             <.controlful_indicator_span char="w" />

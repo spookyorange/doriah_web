@@ -13,7 +13,7 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
 
   def handle_params(%{"id" => id, "loadout_id" => loadout_id}, _, socket) do
     script = Scripting.get_script_with_variables!(id)
-    loadout = VariableManagement.get_loadout!(loadout_id)
+    loadout = VariableManagement.get_loadout!(script.id, loadout_id)
 
     compatible_variables =
       Enum.map(loadout.variables, fn variable ->
@@ -27,11 +27,7 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
      |> assign(:loadout, loadout)
      |> assign(:whole_script, script.whole_script)
      |> assign(:currently_applied_loadout_title, loadout.title)
-     |> assign(
-       :current_variables_in_ram,
-       compatible_variables
-     )
-     |> assign(:currently_applied_variables, compatible_variables)
+     |> load_all_variables_to_ram(compatible_variables)
      |> assign(:saveable, false)
      |> apply_action(socket.assigns.live_action, script)}
   end
@@ -79,15 +75,52 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
     )
   end
 
-  defp assign_new_variable_to_ram(socket) do
-    current_ram_variables_length = length(socket.assigns.current_variables_in_ram)
+  defp load_all_variables_to_ram(socket, variables) do
+    {variables, _accumulator} =
+      Enum.map_reduce(
+        variables,
+        0,
+        fn variable, acc ->
+          {%{key: variable.key, value: variable.value, index: acc}, acc + 1}
+        end
+      )
 
     socket
-    |> assign(
-      :current_variables_in_ram,
-      socket.assigns.current_variables_in_ram ++
-        [%{key: "", value: "", index: current_ram_variables_length}]
-    )
+    |> assign(:current_variables_in_ram, variables)
+    |> assign(:currently_applied_variables, variables)
+  end
+
+  defp assign_new_variable_to_ram(socket) do
+    if length(socket.assigns.current_variables_in_ram) == 0 do
+      desired_index = 0
+
+      socket
+      |> assign(
+        :current_variables_in_ram,
+        socket.assigns.current_variables_in_ram ++
+          [%{key: "", value: "", index: desired_index}]
+      )
+      |> push_event("focus-to-element-with-id", %{id: "key[#{desired_index}]"})
+    else
+      max_of_variables =
+        socket.assigns.current_variables_in_ram
+        |> Enum.map(fn var ->
+          var.index
+        end)
+        |> Enum.max()
+
+      IO.inspect(max_of_variables)
+
+      desired_index = max_of_variables + 1
+
+      socket
+      |> assign(
+        :current_variables_in_ram,
+        socket.assigns.current_variables_in_ram ++
+          [%{key: "", value: "", index: desired_index}]
+      )
+      |> push_event("focus-to-element-with-id", %{id: "key[#{desired_index}]"})
+    end
   end
 
   defp apply_variables_from_ram_to_current(socket) do
@@ -95,6 +128,8 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
     |> assign(:currently_applied_variables, socket.assigns.current_variables_in_ram)
     |> assign(:currently_applied_loadout_title, "Custom")
     |> assign(:saveable, true)
+    |> clear_flash()
+    |> put_flash(:info, "Variables applied to Script")
   end
 
   defp add_params_from_ram_to_applied(params, collective_map_list \\ []) do
@@ -120,7 +155,13 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
       # head_key is index, key is params["key"][head_key] value is params["value"][head_key]
       current_collective_list =
         collective_map_list ++
-          [%{key: params[:key][head_key], value: params[:value][head_key], index: head_key}]
+          [
+            %{
+              key: params[:key][head_key],
+              value: params[:value][head_key],
+              index: String.to_integer(head_key)
+            }
+          ]
 
       # tail of params is going to the next call of this function, kill key and value of head from params and pass!
       head_killed_keys = params[:key] |> Map.delete(head_key)
@@ -162,6 +203,18 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
     {:noreply,
      socket
      |> assign_new_variable_to_ram()}
+  end
+
+  def handle_event("remove_variable_from_ram", %{"variable-index" => variable_index}, socket) do
+    new_variable_set_in_ram =
+      socket.assigns.current_variables_in_ram
+      |> Enum.filter(fn variable ->
+        "#{variable.index}" != variable_index
+      end)
+
+    {:noreply,
+     socket
+     |> assign(:current_variables_in_ram, new_variable_set_in_ram)}
   end
 
   def handle_event("save_variable_changes_to_ram", params, socket) do
@@ -206,6 +259,26 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
       {:noreply,
        socket
        |> push_navigate(to: ~p"/scripts/#{socket.assigns.script}/variable_loadout/load_out")}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("keydown", %{"key" => "n"}, socket) do
+    if socket.assigns.keyboarder && socket.assigns.live_action == :variable_loadout do
+      {:noreply,
+       socket
+       |> assign_new_variable_to_ram()}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("keydown", %{"key" => "a"}, socket) do
+    if socket.assigns.keyboarder && socket.assigns.live_action == :variable_loadout do
+      {:noreply,
+       socket
+       |> apply_variables_from_ram_to_current()}
     else
       {:noreply, socket}
     end

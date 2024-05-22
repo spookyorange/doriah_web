@@ -29,14 +29,15 @@ defmodule Doriah.VariableManagement do
 
   ## Examples
 
-      iex> get_loadout!(123)
+      iex> get_loadout!(1, 123)
       %Loadout{}
 
-      iex> get_loadout!(456)
+      iex> get_loadout!(1, 456)
       ** (Ecto.NoResultsError)
 
   """
-  def get_loadout!(id), do: Repo.get!(Loadout, id)
+  def get_loadout!(script_id, id),
+    do: Repo.one(from l in Loadout, where: l.id == ^id and l.script_id == ^script_id)
 
   @doc """
   Creates a loadout.

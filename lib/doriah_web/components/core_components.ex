@@ -473,7 +473,7 @@ defmodule DoriahWeb.CoreComponents do
           <%= render_slot(@subtitle) %>
         </p>
       </div>
-      <div class="flex-none"><%= render_slot(@actions) %></div>
+      <div class="flex flex-col md:flex-row items-end gap-4"><%= render_slot(@actions) %></div>
     </header>
     """
   end

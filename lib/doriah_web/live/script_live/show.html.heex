@@ -27,39 +27,41 @@
 
 <div class="my-8 flex flex-col">
   <div class="flex mb-2 flex-col gap-2">
-    <div class="flex flex-col md:flex-row gap-2">
-      <.button
-        class="flex grow gap-4 justify-center"
-        phx-click="copy"
-        phx-value-id={"copy-#{@script.id}"}
-        phx-value-type="curl"
-      >
-        <p class="flex flex-col">
-          <span id={"copy-#{@script.id}-curl"} value={"curl -s #{@script_sh_url} | sh"}>
-            as curl
-          </span>
-          <.controlful_indicator_span char="c" />
-        </p>
-        <.icon name="hero-clipboard" class="lg:mt-2" />
-      </.button>
+    <div class="p-2 border-2 border-black">
+      <h4 class="text-lg underline font-bold mb-2 text-center">
+        Copy API link
+      </h4>
+      <div class="flex flex-col md:flex-row gap-2">
+        <.button
+          class="flex grow gap-4 justify-center"
+          phx-click="copy"
+          phx-value-id={"copy-#{@script.id}"}
+          phx-value-type="curl"
+        >
+          <p class="flex flex-col">
+            <span id={"copy-#{@script.id}-curl"} value={"curl -s #{@script_sh_url} | sh"}>
+              as curl
+            </span>
+            <.controlful_indicator_span char="c" />
+          </p>
+          <.icon name="hero-clipboard" class="lg:mt-2" />
+        </.button>
 
-      <.button
-        class="flex grow gap-4 justify-center"
-        phx-click="copy"
-        phx-value-id={"copy-#{@script.id}"}
-        phx-value-type="wget"
-      >
-        <p class="flex flex-col">
-          <span
-            id={"copy-#{@script.id}-wget"}
-            value={"wget -q --output-document=.script#{@script.id}.sh #{@script_sh_url} && sh .script#{@script.id}.sh && rm .script#{@script.id}.sh"}
-          >
-            as wget
-          </span>
-          <.controlful_indicator_span char="w" />
-        </p>
-        <.icon name="hero-clipboard" class="lg:mt-2" />
-      </.button>
+        <.button
+          class="flex grow gap-4 justify-center"
+          phx-click="copy"
+          phx-value-id={"copy-#{@script.id}"}
+          phx-value-type="wget"
+        >
+          <p class="flex flex-col">
+            <span id={"copy-#{@script.id}-wget"} value={"wget -qO- #{@script_sh_url}"}>
+              as wget
+            </span>
+            <.controlful_indicator_span char="w" />
+          </p>
+          <.icon name="hero-clipboard" class="lg:mt-2" />
+        </.button>
+      </div>
     </div>
 
     <a href={~p"/api/scripts/as_sh_file/#{@script}"} target="_blank" class="flex">
@@ -70,8 +72,7 @@
   </div>
 
   <p class="mb-2 p-2 bg-zinc-900 text-white flex gap-4 justify-center">
-    Lines are prefilled with default variable values in read mode
-    <.icon name="hero-information-circle" />
+    No loadout is loaded<.icon name="hero-information-circle" />
   </p>
   <div class="flex">
     <div class="w-full bg-zinc-950 text-white p-4">

@@ -75,7 +75,7 @@ defmodule DoriahWeb.ScriptLive.Show do
     end
   end
 
-  def handle_event("keydown", %{"key" => "c"}, socket) do
+  def handle_event("keydown", %{"key" => "w"}, socket) do
     if socket.assigns.keyboarder && socket.assigns.live_action == :show do
       {:noreply,
        socket

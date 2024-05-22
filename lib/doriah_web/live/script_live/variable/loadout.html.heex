@@ -9,6 +9,13 @@
 <.header>
   <%= @script.title %> - Variable Loadout Management
   <:subtitle>Manage loadouts</:subtitle>
+  <:actions>
+    <.link patch={~p"/scripts/#{@script}/edit_mode"} phx-click={JS.push_focus()}>
+      <.button>
+        <.controlful_indicator_powered_paragraph name="Edit The Script" char="e" />
+      </.button>
+    </.link>
+  </:actions>
 </.header>
 
 <.controlful_panel controlful={@controlful} keyboarder={@keyboarder} />
@@ -19,6 +26,47 @@
       Currently applied loadout:
       <span class="font-extrabold"><%= @currently_applied_loadout_title %></span>
     </h3>
+    <.button>
+      <.controlful_indicator_powered_paragraph name="Load Loadout" char="l" />
+    </.button>
+    <form
+      :if={@saveable && @loadout}
+      class="flex flex-col md:flex-row items-center gap-4 p-4 border-2 border-black"
+      phx-submit="update_loadout"
+    >
+      <h3 class="bg-zinc-950 text-white text-xl font-medium p-2 border-2 border-white rounded-xl">
+        Update this loadout
+      </h3>
+      <div class="grow flex flex-col md:flex-row gap-4 justify-around items-center">
+        <label for="loadout[title]" class="flex gap-4">
+          Title:
+          <input
+            name="loadout[title]"
+            id="loadout[title]"
+            class="border-2 border-black px-2"
+            value={@loadout.title}
+          />
+        </label>
+        <.button type="submit">Save</.button>
+      </div>
+    </form>
+
+    <form
+      :if={@saveable}
+      class="flex flex-col md:flex-row items-center gap-4 p-4 border-2 border-black"
+      phx-submit="save_loadout"
+    >
+      <h3 class="bg-zinc-950 text-white text-xl font-medium p-2 border-2 border-white rounded-xl">
+        Save new loadout
+      </h3>
+      <div class="grow flex flex-col md:flex-row gap-4 justify-around items-center">
+        <label for="loadout[title]" class="flex gap-4">
+          Title:
+          <input name="loadout[title]" id="loadout[title]" class="border-2 border-black px-2" />
+        </label>
+        <.button type="submit">Save</.button>
+      </div>
+    </form>
 
     <div class="flex flex-col border-2 border-black p-2">
       <h3 class="text-xl underline my-2">
@@ -75,13 +123,28 @@
       </p>
     </div>
   </div>
-</div>
 
-<.modal
-  :if={@live_action == :variables}
-  id="script-variable-modal"
-  show
-  on_cancel={JS.patch(~p"/scripts/#{@script}/edit_mode")}
->
-  <.script_variable_dashboard script={@script} variable_stream={@streams.script_variables} />
-</.modal>
+  <.modal
+    :if={@live_action == :load_out}
+    id="script-variable-modal"
+    show
+    on_cancel={JS.patch(~p"/scripts/#{@script}/variable_loadout")}
+  >
+    <.header>
+      Load a Loadout
+      <:subtitle>uhh load and out??(ESC for no loadout at all!)</:subtitle>
+    </.header>
+
+    <div class="flex flex-col gap-4 mt-4">
+      <.link
+        :for={loadout <- @script.loadouts}
+        patch={~p"/scripts/#{@script}/variable_loadout/#{loadout.id}"}
+        class="flex rounded-xl bg-gray-950 text-white focus-visible:ring-zinc-500 focus-visible:ring-8"
+      >
+        <.button class="grow" tabindex="-1">
+          <%= loadout.title %>
+        </.button>
+      </.link>
+    </div>
+  </.modal>
+</div>

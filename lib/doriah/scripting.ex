@@ -56,6 +56,7 @@ defmodule Doriah.Scripting do
   def get_script_with_variables!(id) do
     Repo.get!(Script, id)
     |> Repo.preload(script_variables: from(v in ScriptVariable, order_by: v.inserted_at))
+    |> Repo.preload(:loadouts)
   end
 
   @doc """

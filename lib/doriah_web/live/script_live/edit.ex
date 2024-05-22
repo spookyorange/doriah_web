@@ -155,7 +155,7 @@ defmodule DoriahWeb.ScriptLive.Edit do
     if socket.assigns.keyboarder && socket.assigns.live_action == :edit_mode do
       {:noreply,
        socket
-       |> push_redirect(to: ~p"/scripts/#{socket.assigns.script}/edit_mode/variables")
+       |> push_redirect(to: ~p"/scripts/#{socket.assigns.script}/variable_loadout")
        |> escape_controlful_and_keyboarder()}
     else
       {:noreply, socket}

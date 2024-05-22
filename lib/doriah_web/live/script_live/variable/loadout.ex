@@ -1,15 +1,39 @@
 defmodule DoriahWeb.ScriptLive.Variable.Loadout do
+  alias Doriah.VariableManagement
   alias DoriahWeb.BaseUtil.KeyboardSupport
 
   use DoriahWeb, :live_view
   use DoriahWeb.BaseUtil.Controlful
 
-  import DoriahWeb.ScriptLive.Variable.Index
-
   alias Doriah.Scripting
 
   def mount(_, _, socket) do
     {:ok, socket |> assign_controlful()}
+  end
+
+  def handle_params(%{"id" => id, "loadout_id" => loadout_id}, _, socket) do
+    script = Scripting.get_script_with_variables!(id)
+    loadout = VariableManagement.get_loadout!(loadout_id)
+
+    compatible_variables =
+      Enum.map(loadout.variables, fn variable ->
+        %{key: variable["key"], value: variable["value"], index: variable["index"]}
+      end)
+
+    {:noreply,
+     socket
+     |> assign(:page_title, page_title(socket.assigns.live_action))
+     |> assign(:script, script)
+     |> assign(:loadout, loadout)
+     |> assign(:whole_script, script.whole_script)
+     |> assign(:currently_applied_loadout_title, loadout.title)
+     |> assign(
+       :current_variables_in_ram,
+       compatible_variables
+     )
+     |> assign(:currently_applied_variables, compatible_variables)
+     |> assign(:saveable, false)
+     |> apply_action(socket.assigns.live_action, script)}
   end
 
   def handle_params(%{"id" => id}, _, socket) do
@@ -19,6 +43,7 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
      |> assign(:script, script)
+     |> assign(:loadout, nil)
      |> assign(:whole_script, script.whole_script)
      |> assign(:currently_applied_loadout_title, "None")
      |> assign(
@@ -26,10 +51,15 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
        []
      )
      |> assign(:currently_applied_variables, [])
+     |> assign(:saveable, false)
      |> apply_action(socket.assigns.live_action, script)}
   end
 
   defp apply_action(socket, :variable_loadout, _script) do
+    socket
+  end
+
+  defp apply_action(socket, :load_out, _script) do
     socket
   end
 
@@ -64,6 +94,7 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
     socket
     |> assign(:currently_applied_variables, socket.assigns.current_variables_in_ram)
     |> assign(:currently_applied_loadout_title, "Custom")
+    |> assign(:saveable, true)
   end
 
   defp add_params_from_ram_to_applied(params, collective_map_list \\ []) do
@@ -101,6 +132,32 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
     end
   end
 
+  defp save_loadout_from_applied_to_database(socket, title) do
+    applied_variable_map = socket.assigns.currently_applied_variables
+
+    {:ok, loadout} =
+      VariableManagement.create_loadout(socket.assigns.script.id, %{
+        title: title,
+        variables: applied_variable_map
+      })
+
+    socket
+    |> push_patch(to: ~p"/scripts/#{socket.assigns.script.id}/variable_loadout/#{loadout.id}")
+  end
+
+  defp update_loadout(socket, title) do
+    applied_variable_map = socket.assigns.currently_applied_variables
+
+    {:ok, loadout} =
+      VariableManagement.update_loadout(socket.assigns.loadout, %{
+        title: title,
+        variables: applied_variable_map
+      })
+
+    socket
+    |> push_patch(to: ~p"/scripts/#{socket.assigns.script.id}/variable_loadout/#{loadout.id}")
+  end
+
   def handle_event("create_new_variable", _, socket) do
     {:noreply,
      socket
@@ -122,6 +179,18 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
      |> apply_variables_from_ram_to_current()}
   end
 
+  def handle_event("save_loadout", %{"loadout" => %{"title" => loadout_title}}, socket) do
+    {:noreply,
+     socket
+     |> save_loadout_from_applied_to_database(loadout_title)}
+  end
+
+  def handle_event("update_loadout", %{"loadout" => %{"title" => loadout_title}}, socket) do
+    {:noreply,
+     socket
+     |> update_loadout(loadout_title)}
+  end
+
   def handle_event("keydown", %{"key" => "b"}, socket) do
     if socket.assigns.keyboarder && socket.assigns.live_action == :variable_loadout do
       {:noreply,
@@ -132,7 +201,28 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
     end
   end
 
+  def handle_event("keydown", %{"key" => "l"}, socket) do
+    if socket.assigns.keyboarder && socket.assigns.live_action == :variable_loadout do
+      {:noreply,
+       socket
+       |> push_navigate(to: ~p"/scripts/#{socket.assigns.script}/variable_loadout/load_out")}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("keydown", %{"key" => "e"}, socket) do
+    if socket.assigns.keyboarder && socket.assigns.live_action == :variable_loadout do
+      {:noreply,
+       socket
+       |> push_redirect(to: ~p"/scripts/#{socket.assigns.script}/edit_mode")}
+    else
+      {:noreply, socket}
+    end
+  end
+
   use KeyboardSupport
 
   defp page_title(:variable_loadout), do: "Script - Variable Loadouts"
+  defp page_title(:load_out), do: "Script - Load Loadout"
 end

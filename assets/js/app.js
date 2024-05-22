@@ -57,7 +57,7 @@ window.addEventListener("phx:copy-to-clipboard", (e) => {
   const target = document.getElementById(e.detail.id)
 
   if (target) {
-    navigator.clipboard.writeText(target.textContent.trim())
+    navigator.clipboard.writeText(target.getAttribute("value"))
   }
 })
 

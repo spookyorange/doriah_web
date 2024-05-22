@@ -28,8 +28,8 @@ defmodule DoriahWeb.ScriptLive.Show do
   end
 
   @impl true
-  def handle_event("copy", _params, socket) do
-    {:noreply, send_copy_script_link_command(socket)}
+  def handle_event("copy", %{"type" => type}, socket) do
+    {:noreply, send_copy_script_link_command(socket, type)}
   end
 
   def handle_event("keydown", %{"key" => "e"}, socket) do
@@ -68,7 +68,18 @@ defmodule DoriahWeb.ScriptLive.Show do
     if socket.assigns.keyboarder && socket.assigns.live_action == :show do
       {:noreply,
        socket
-       |> send_copy_script_link_command
+       |> send_copy_script_link_command("curl")
+       |> escape_controlful_and_keyboarder()}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("keydown", %{"key" => "c"}, socket) do
+    if socket.assigns.keyboarder && socket.assigns.live_action == :show do
+      {:noreply,
+       socket
+       |> send_copy_script_link_command("wget")
        |> escape_controlful_and_keyboarder()}
     else
       {:noreply, socket}
@@ -77,9 +88,9 @@ defmodule DoriahWeb.ScriptLive.Show do
 
   use DoriahWeb.BaseUtil.KeyboardSupport
 
-  def send_copy_script_link_command(socket) do
+  def send_copy_script_link_command(socket, type) do
     socket
-    |> push_event("copy-to-clipboard", %{"id" => "copy-#{socket.assigns.script.id}"})
+    |> push_event("copy-to-clipboard", %{"id" => "copy-#{socket.assigns.script.id}-#{type}"})
     |> clear_flash()
     |> put_flash(:info, "Copied to clipboard!")
   end

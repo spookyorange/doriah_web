@@ -21,9 +21,15 @@ module.exports = {
           '0%, 100%': { transform: 'translate(8px, 0px)' },
           '50%': { transform: 'translate(-8px, 0)' }
         },
+        grow: {
+          '0%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.1)' },
+          '100%': { transform: 'scale(1)' }
+        },
       },
       animation: {
-        icondance: 'icondance 1.5s ease-in-out infinite'
+        icondance: 'icondance 1.5s ease-in-out infinite',
+        grow: 'grow 1s ease-in-out forwards'
       },
     },
   },

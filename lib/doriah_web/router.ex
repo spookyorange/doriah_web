@@ -46,6 +46,11 @@ defmodule DoriahWeb.Router do
     pipe_through :api
 
     get "/scripts/as_sh/:id", ScriptController, :get_script
+
+    get "/scripts/as_sh/:id/with_applied_loadout/:loadout_id",
+        ScriptController,
+        :get_script_with_applied_loadout
+
     get "/scripts/as_sh_file/:id", ScriptController, :get_script_download
   end
 

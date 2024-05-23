@@ -4,6 +4,7 @@ defmodule Doriah.Scripting do
   """
 
   import Ecto.Query, warn: false
+  alias Doriah.VariableManagement
   alias Doriah.Repo
 
   alias Doriah.Scripting.Script
@@ -148,6 +149,28 @@ defmodule Doriah.Scripting do
       end)
 
     cooked_variables = put_list_to_map(other_params_as_list)
+
+    fill_content_with_variables(script.whole_script, cooked_variables)
+  end
+
+  def get_script_as_sh_file_with_loadout(params) do
+    script = get_script_with_variables!(params["id"])
+    loadout = VariableManagement.get_loadout!(params["id"], params["loadout_id"])
+
+    other_param_keys =
+      Map.keys(params)
+      |> Enum.filter(fn param_key -> param_key != "id" || param_key != "loadout_id" end)
+
+    half_baked_variables = loadout.variables |> standardize_variables() |> put_list_to_map()
+
+    # for customs, we'll do it aggressively, if matches, just override it, doesnt -> create it no problem!
+    other_params_as_list =
+      other_param_keys
+      |> Enum.map(fn param_key ->
+        %{param_key => params[param_key]}
+      end)
+
+    cooked_variables = put_list_to_map(other_params_as_list, half_baked_variables)
 
     fill_content_with_variables(script.whole_script, cooked_variables)
   end

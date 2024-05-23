@@ -31,6 +31,10 @@ defmodule DoriahWeb.ScriptLive.Edit do
     socket
   end
 
+  defp apply_action(socket, :basic_info, _script) do
+    socket
+  end
+
   defp get_row_count_of_textarea(area_value) do
     String.split(area_value, "\n") |> length()
   end
@@ -61,6 +65,12 @@ defmodule DoriahWeb.ScriptLive.Edit do
     {:noreply, socket |> save_whole_script()}
   end
 
+  def handle_event("delete_script", _, socket) do
+    {:ok, _} = Scripting.delete_script(socket.assigns.script)
+
+    {:noreply, socket |> push_navigate(to: ~p"/scripts")}
+  end
+
   def handle_event("keydown", %{"key" => "b"}, socket) do
     if socket.assigns.keyboarder && socket.assigns.live_action == :edit_mode do
       {:noreply,
@@ -75,8 +85,7 @@ defmodule DoriahWeb.ScriptLive.Edit do
     if socket.assigns.keyboarder && socket.assigns.live_action == :edit_mode do
       {:noreply,
        socket
-       |> push_redirect(to: ~p"/scripts/#{socket.assigns.script}/edit_mode/basic_info")
-       |> escape_controlful_and_keyboarder()}
+       |> push_redirect(to: ~p"/scripts/#{socket.assigns.script}/edit_mode/basic_info")}
     else
       {:noreply, socket}
     end
@@ -86,8 +95,7 @@ defmodule DoriahWeb.ScriptLive.Edit do
     if socket.assigns.keyboarder && socket.assigns.live_action == :edit_mode do
       {:noreply,
        socket
-       |> push_event("focus-on-id-textarea-and-focus-end", %{"id" => "whole-script[itself]"})
-       |> escape_controlful_and_keyboarder()}
+       |> push_event("focus-on-id-textarea-and-focus-end", %{"id" => "whole-script[itself]"})}
     else
       {:noreply, socket}
     end
@@ -97,8 +105,7 @@ defmodule DoriahWeb.ScriptLive.Edit do
     if socket.assigns.keyboarder && socket.assigns.live_action == :edit_mode do
       {:noreply,
        socket
-       |> save_whole_script()
-       |> escape_controlful_and_keyboarder()}
+       |> save_whole_script()}
     else
       {:noreply, socket}
     end

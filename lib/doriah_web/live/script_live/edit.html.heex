@@ -71,4 +71,28 @@
       </.button>
     </form>
   </div>
+
+  <.button
+    class="flex w-full gap-4 justify-center align-center mt-2"
+    phx-click="delete_script"
+    data-confirm="Are you sure you want to delete this Script and all its loadouts with it?"
+  >
+    Delete Script <.icon name="hero-trash" />
+  </.button>
+
+  <.modal
+    :if={@live_action == :basic_info}
+    id="script-modal"
+    show
+    on_cancel={JS.patch(~p"/scripts/#{@script}/edit_mode")}
+  >
+    <.live_component
+      module={DoriahWeb.ScriptLive.FormComponent}
+      id={@script.id}
+      title={@page_title}
+      action={@live_action}
+      script={@script}
+      patch={~p"/scripts/#{@script}/edit_mode"}
+    />
+  </.modal>
 </div>

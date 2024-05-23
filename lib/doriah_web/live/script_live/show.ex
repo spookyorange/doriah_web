@@ -92,7 +92,7 @@ defmodule DoriahWeb.ScriptLive.Show do
     socket
     |> push_event("copy-to-clipboard", %{"id" => "copy-#{socket.assigns.script.id}-#{type}"})
     |> clear_flash()
-    |> put_flash(:info, "Copied to clipboard!")
+    |> put_flash(:info, "Copied as #{type} to clipboard!")
   end
 
   def fill_variables_to_script(script, variables) do

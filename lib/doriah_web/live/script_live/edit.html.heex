@@ -38,15 +38,6 @@
 <.controlful_panel controlful={@controlful} keyboarder={@keyboarder} />
 
 <div class="my-8 flex flex-col">
-  <div class="flex flex-col gap-2 my-2">
-    <.link patch={~p"/scripts/#{@script}/edit_mode/import"} class="flex w-full">
-      <.button class="flex justify-center gap-4 w-full">
-        <.controlful_indicator_powered_paragraph name="Import" char="i" keyboarder={@keyboarder} />
-        <.icon name="hero-clipboard-document-list" class="lg:mt-2" />
-      </.button>
-    </.link>
-  </div>
-
   <div class="flex">
     <form phx-submit="save_whole_script" class="w-full relative">
       <div class="hidden lg:flex lg:flex-col lg:absolute left-[-60px] top-[2px]">
@@ -81,53 +72,3 @@
     </form>
   </div>
 </div>
-
-<.modal
-  :if={@live_action == :import}
-  id="script-insert-modal"
-  on_cancel={JS.patch(~p"/scripts/#{@script}/edit_mode")}
-  show
->
-  <form phx-submit="submit_import_script" class="flex flex-col gap-4 w-full">
-    <div class="flex gap-4 justify-center align-center p-4 rounded-xl bg-red-700 text-white">
-      Warning: This will remove all prior lines, use with caution
-      <.icon name="hero-exclamation-circle" />
-    </div>
-    <label for="script_import[import_textarea]" class="flex flex-col gap-2">
-      Script to import from
-      <textarea
-        name="script_import[import_textarea]"
-        id="script_import[import_textarea]"
-        phx-change="import_input_change"
-        rows={@import_text_height}
-        class="w-full bg-zinc-950 text-white"
-      />
-    </label>
-    <.button type="submit">Import</.button>
-  </form>
-</.modal>
-
-<.modal
-  :if={@live_action == :variables}
-  id="script-variable-modal"
-  show
-  on_cancel={JS.patch(~p"/scripts/#{@script}/edit_mode")}
->
-  <.script_variable_dashboard script={@script} variable_stream={@streams.script_variables} />
-</.modal>
-
-<.modal
-  :if={@live_action == :basic_info}
-  id="script-modal"
-  show
-  on_cancel={JS.patch(~p"/scripts/#{@script}/edit_mode")}
->
-  <.live_component
-    module={DoriahWeb.ScriptLive.FormComponent}
-    id={@script.id}
-    title={@page_title}
-    action={@live_action}
-    script={@script}
-    patch={~p"/scripts/#{@script}/edit_mode"}
-  />
-</.modal>

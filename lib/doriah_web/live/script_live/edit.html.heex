@@ -1,7 +1,11 @@
 <div class="flex mb-4">
   <.back navigate={~p"/scripts/#{@script}"}>
     <div>
-      <.controlful_indicator_powered_paragraph name="Back to preview" char="b" />
+      <.controlful_indicator_powered_paragraph
+        name="Back to preview"
+        char="b"
+        keyboarder={@keyboarder}
+      />
     </div>
   </.back>
 </div>
@@ -12,12 +16,20 @@
   <:actions>
     <.link patch={~p"/scripts/#{@script}/edit_mode/basic_info"} phx-click={JS.push_focus()}>
       <.button>
-        <.controlful_indicator_powered_paragraph name="Edit Basic Info" char="e" />
+        <.controlful_indicator_powered_paragraph
+          name="Edit Basic Info"
+          char="e"
+          keyboarder={@keyboarder}
+        />
       </.button>
     </.link>
     <.link patch={~p"/scripts/#{@script}/variable_loadout"} phx-click={JS.push_focus()}>
       <.button>
-        <.controlful_indicator_powered_paragraph name="Variable Loadout Management" char="v" />
+        <.controlful_indicator_powered_paragraph
+          name="Variable Loadout Management"
+          char="v"
+          keyboarder={@keyboarder}
+        />
       </.button>
     </.link>
   </:actions>
@@ -29,7 +41,7 @@
   <div class="flex flex-col gap-2 my-2">
     <.link patch={~p"/scripts/#{@script}/edit_mode/import"} class="flex w-full">
       <.button class="flex justify-center gap-4 w-full">
-        <.controlful_indicator_powered_paragraph name="Import" char="i" />
+        <.controlful_indicator_powered_paragraph name="Import" char="i" keyboarder={@keyboarder} />
         <.icon name="hero-clipboard-document-list" class="lg:mt-2" />
       </.button>
     </.link>
@@ -59,7 +71,11 @@
         </div>
       </label>
       <.button class="flex w-full gap-4 justify-center align-center mt-2" type="submit">
-        <.controlful_indicator_powered_paragraph name="Save Changes" char="s" />
+        <.controlful_indicator_powered_paragraph
+          name="Save Changes"
+          char="s"
+          keyboarder={@keyboarder}
+        />
         <.icon name="hero-check-circle" class="lg:mt-2" />
       </.button>
     </form>

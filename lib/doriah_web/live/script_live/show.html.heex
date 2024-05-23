@@ -1,7 +1,11 @@
 <div class="flex mb-4">
   <.back navigate={~p"/scripts"}>
     <div>
-      <.controlful_indicator_powered_paragraph name="Back to scripts" char="b" />
+      <.controlful_indicator_powered_paragraph
+        name="Back to scripts"
+        char="b"
+        keyboarder={@keyboarder}
+      />
     </div>
   </.back>
 </div>
@@ -12,12 +16,20 @@
   <:actions>
     <.link patch={~p"/scripts/#{@script}/edit_mode"} phx-click={JS.push_focus()}>
       <.button>
-        <.controlful_indicator_powered_paragraph name="Edit The Script" char="e" />
+        <.controlful_indicator_powered_paragraph
+          name="Edit The Script"
+          char="e"
+          keyboarder={@keyboarder}
+        />
       </.button>
     </.link>
     <.link patch={~p"/scripts/#{@script}/variable_loadout"} phx-click={JS.push_focus()}>
       <.button>
-        <.controlful_indicator_powered_paragraph name="Variable Loadout Management" char="v" />
+        <.controlful_indicator_powered_paragraph
+          name="Variable Loadout Management"
+          char="v"
+          keyboarder={@keyboarder}
+        />
       </.button>
     </.link>
   </:actions>
@@ -42,7 +54,7 @@
             <span id={"copy-#{@script.id}-curl"} value={"curl -s #{@script_sh_url} | sh"}>
               as curl
             </span>
-            <.controlful_indicator_span char="c" />
+            <.controlful_indicator_span char="c" keyboarder={@keyboarder} />
           </p>
           <.icon name="hero-clipboard" class="lg:mt-2" />
         </.button>
@@ -57,7 +69,7 @@
             <span id={"copy-#{@script.id}-wget"} value={"wget -qO- #{@script_sh_url} | sh"}>
               as wget
             </span>
-            <.controlful_indicator_span char="w" />
+            <.controlful_indicator_span char="w" keyboarder={@keyboarder} />
           </p>
           <.icon name="hero-clipboard" class="lg:mt-2" />
         </.button>

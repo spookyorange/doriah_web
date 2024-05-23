@@ -3,7 +3,11 @@
   <:actions>
     <.link patch={~p"/scripts/new"} tabindex="-1">
       <.button tabindex="-1">
-        <.controlful_indicator_powered_paragraph name="New Script" char="n" />
+        <.controlful_indicator_powered_paragraph
+          name="New Script"
+          char="n"
+          keyboarder={@keyboarder}
+        />
       </.button>
     </.link>
   </:actions>

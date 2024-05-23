@@ -16,6 +16,15 @@ module.exports = {
       colors: {
         brand: "#FD4F00",
       },
+      keyframes: {
+        icondance: {
+          '0%, 100%': { transform: 'translate(8px, 0px)' },
+          '50%': { transform: 'translate(-8px, 0)' }
+        },
+      },
+      animation: {
+        icondance: 'icondance 1.5s ease-in-out infinite'
+      },
     },
   },
   plugins: [

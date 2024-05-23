@@ -81,17 +81,31 @@
         Download as .sh file <.icon name="hero-arrow-down-tray" />
       </.button>
     </a>
+
+    <.link patch={~p"/scripts/#{@script}/select_loadout"} phx-click={JS.push_focus()}>
+      <.button id={"download-#{@script.id}"} class="flex w-full justify-center gap-4">
+        <.controlful_indicator_powered_paragraph
+          name="Load Loadout"
+          char="l"
+          keyboarder={@keyboarder}
+        />
+      </.button>
+    </.link>
   </div>
 
   <p class="mb-2 p-2 bg-zinc-900 text-white flex gap-4 justify-center">
-    No loadout is loaded<.icon name="hero-information-circle" />
+    <%= if @loadout do %>
+      <.icon name="hero-information-circle" />Loaded loadout: <%= @loadout.title %>
+    <% else %>
+      <.icon name="hero-information-circle" />No loadout is loaded
+    <% end %>
   </p>
   <div class="flex">
     <div class="w-full bg-zinc-950 text-white p-4">
       <p :for={
         line <-
           String.split(
-            DoriahWeb.ScriptLive.Show.fill_variables_to_script(@whole_script, @script_variables),
+            DoriahWeb.ScriptLive.Show.fill_variables_to_script(@whole_script, @loadout),
             "\n"
           )
       }>
@@ -99,4 +113,31 @@
       </p>
     </div>
   </div>
+
+  <.modal
+    :if={@live_action == :select_loadout}
+    id="script-modal"
+    show
+    on_cancel={JS.patch(~p"/scripts/#{@script}")}
+  >
+    <.header>
+      Load a Loadout
+      <:subtitle>
+        load and, uh.. out? whatever,
+        <span class="font-bold text-black">close modal for no loadout</span>
+      </:subtitle>
+    </.header>
+
+    <div class="flex flex-col gap-4 mt-4">
+      <.link
+        :for={loadout <- @script.loadouts}
+        patch={~p"/scripts/#{@script}/with_loadout/#{loadout.id}"}
+        class="flex rounded-xl bg-gray-950 text-white focus-visible:ring-zinc-500 focus-visible:ring-8"
+      >
+        <.button class="grow" tabindex="-1">
+          <%= loadout.title %>
+        </.button>
+      </.link>
+    </div>
+  </.modal>
 </div>

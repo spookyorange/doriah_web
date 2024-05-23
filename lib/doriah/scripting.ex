@@ -292,7 +292,7 @@ defmodule Doriah.Scripting do
   def standardize_variables(variables) do
     variables
     |> Enum.map(fn variable ->
-      %{variable.key => variable.default_value}
+      %{variable["key"] => variable["value"]}
     end)
   end
 

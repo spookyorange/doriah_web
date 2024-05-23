@@ -22,7 +22,6 @@ defmodule DoriahWeb.ScriptLive.Show do
      |> assign(:loadout, loadout)
      |> assign(:script_sh_url, url(~p"/api/scripts/as_sh/#{script.id}"))
      |> assign(:whole_script, script.whole_script)
-     |> assign(:script_variables, script.script_variables)
      |> apply_action(socket.assigns.live_action, script)}
   end
 
@@ -37,7 +36,6 @@ defmodule DoriahWeb.ScriptLive.Show do
      |> assign(:loadout, nil)
      |> assign(:script_sh_url, url(~p"/api/scripts/as_sh/#{script.id}"))
      |> assign(:whole_script, script.whole_script)
-     |> assign(:script_variables, script.script_variables)
      |> apply_action(socket.assigns.live_action, script)}
   end
 
@@ -144,13 +142,6 @@ defmodule DoriahWeb.ScriptLive.Show do
         |> Scripting.put_list_to_map()
       )
     end
-
-    # Scripting.fill_content_with_variables(
-    #   script,
-    #   variables
-    #   |> Scripting.standardize_variables()
-    #   |> Scripting.put_list_to_map()
-    # )
   end
 
   defp page_title(:show), do: "Script - Preview"

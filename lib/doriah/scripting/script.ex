@@ -7,8 +7,6 @@ defmodule Doriah.Scripting.Script do
     field :title, :string
     field :whole_script, :string, default: ""
 
-    has_many :script_lines, Doriah.Scripting.ScriptLine
-    has_many :script_variables, Doriah.Scripting.ScriptVariable
     has_many :loadouts, Doriah.VariableManagement.Loadout
 
     timestamps(type: :utc_datetime)

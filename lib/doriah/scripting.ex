@@ -4,8 +4,6 @@ defmodule Doriah.Scripting do
   """
 
   import Ecto.Query, warn: false
-  alias Doriah.Scripting.ScriptVariable
-  alias Doriah.Scripting.ScriptLine
   alias Doriah.Repo
 
   alias Doriah.Scripting.Script
@@ -55,35 +53,7 @@ defmodule Doriah.Scripting do
   """
   def get_script_with_variables!(id) do
     Repo.get!(Script, id)
-    |> Repo.preload(script_variables: from(v in ScriptVariable, order_by: v.inserted_at))
     |> Repo.preload(:loadouts)
-  end
-
-  @doc """
-  Gets a single scripts line count.
-
-  Raises `Ecto.NoResultsError` if the Script does not exist.
-
-  ## Examples
-
-      iex> get_script_lines_max_order!(123)
-      number
-
-      iex> get_script_lines_max_order!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_script_lines_max_order!(id) do
-    max_order =
-      Repo.one!(
-        from s in Script,
-          join: l in ScriptLine,
-          on: s.id == l.script_id,
-          where: s.id == ^id,
-          select: max(l.order)
-      )
-
-    max_order || 0
   end
 
   @doc """

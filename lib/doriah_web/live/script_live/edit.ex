@@ -104,6 +104,16 @@ defmodule DoriahWeb.ScriptLive.Edit do
     end
   end
 
+  def handle_event("keydown", %{"key" => "v"}, socket) do
+    if socket.assigns.keyboarder && socket.assigns.live_action == :edit_mode do
+      {:noreply,
+       socket
+       |> push_navigate(to: ~p"/scripts/#{socket.assigns.script}/variable_loadout")}
+    else
+      {:noreply, socket}
+    end
+  end
+
   use DoriahWeb.BaseUtil.KeyboardSupport
 
   def save_whole_script(socket) do

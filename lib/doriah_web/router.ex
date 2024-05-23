@@ -38,8 +38,6 @@ defmodule DoriahWeb.Router do
          :variable_loadout
 
     live "/scripts/:id/edit_mode", ScriptLive.Edit, :edit_mode
-    live "/scripts/:id/edit_mode/variables", ScriptLive.Edit, :variables
-    live "/scripts/:id/edit_mode/import", ScriptLive.Edit, :import
     live "/scripts/:id/edit_mode/basic_info", ScriptLive.Edit, :basic_info
   end
 

@@ -27,6 +27,10 @@ defmodule DoriahWeb.Router do
     live "/scripts/:id/variable_loadout", ScriptLive.Variable.Loadout, :variable_loadout
     live "/scripts/:id/variable_loadout/load_out", ScriptLive.Variable.Loadout, :load_out
 
+    live "/scripts/:id/variable_loadout/delete_loadout",
+         ScriptLive.Variable.Loadout,
+         :delete_loadout
+
     live "/scripts/:id/variable_loadout/:loadout_id",
          ScriptLive.Variable.Loadout,
          :variable_loadout

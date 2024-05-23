@@ -59,6 +59,10 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
     socket
   end
 
+  defp apply_action(socket, :delete_loadout, _script) do
+    socket
+  end
+
   defp change_variables_to_desired_structure(variables) do
     variables
     |> Enum.map(fn variable ->
@@ -108,8 +112,6 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
           var.index
         end)
         |> Enum.max()
-
-      IO.inspect(max_of_variables)
 
       desired_index = max_of_variables + 1
 
@@ -184,6 +186,7 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
 
     socket
     |> push_patch(to: ~p"/scripts/#{socket.assigns.script.id}/variable_loadout/#{loadout.id}")
+    |> put_flash(:info, "Loadout successfully saved to database")
   end
 
   defp update_loadout(socket, title) do
@@ -197,6 +200,7 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
 
     socket
     |> push_patch(to: ~p"/scripts/#{socket.assigns.script.id}/variable_loadout/#{loadout.id}")
+    |> put_flash(:info, "Loadout successfully updated in the database")
   end
 
   def handle_event("create_new_variable", _, socket) do
@@ -232,7 +236,7 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
      |> apply_variables_from_ram_to_current()}
   end
 
-  def handle_event("save_loadout", %{"loadout" => %{"title" => loadout_title}}, socket) do
+  def handle_event("save_loadout", %{"new_loadout" => %{"title" => loadout_title}}, socket) do
     {:noreply,
      socket
      |> save_loadout_from_applied_to_database(loadout_title)}
@@ -242,6 +246,16 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
     {:noreply,
      socket
      |> update_loadout(loadout_title)}
+  end
+
+  def handle_event("delete_loadout", %{"loadout-id" => loadout_id}, socket) do
+    loadout = VariableManagement.get_loadout!(socket.assigns.script.id, loadout_id)
+    {:ok, _} = VariableManagement.delete_loadout(loadout)
+
+    {:noreply,
+     socket
+     |> push_patch(to: ~p"/scripts/#{socket.assigns.script}/variable_loadout")
+     |> put_flash(:info, "Loadout deleted successfully")}
   end
 
   def handle_event("keydown", %{"key" => "b"}, socket) do
@@ -259,6 +273,38 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
       {:noreply,
        socket
        |> push_navigate(to: ~p"/scripts/#{socket.assigns.script}/variable_loadout/load_out")}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("keydown", %{"key" => "u"}, socket) do
+    if socket.assigns.keyboarder && socket.assigns.live_action == :variable_loadout &&
+         socket.assigns.saveable do
+      {:noreply,
+       socket
+       |> push_event("focus-to-element-with-id", %{id: "loadout[title]"})}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("keydown", %{"key" => "s"}, socket) do
+    if socket.assigns.keyboarder && socket.assigns.live_action == :variable_loadout &&
+         socket.assigns.saveable do
+      {:noreply,
+       socket
+       |> push_event("focus-to-element-with-id", %{id: "new_loadout[title]"})}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("keydown", %{"key" => "d"}, socket) do
+    if socket.assigns.keyboarder && socket.assigns.live_action == :variable_loadout do
+      {:noreply,
+       socket
+       |> push_patch(to: ~p"/scripts/#{socket.assigns.script}/variable_loadout/delete_loadout")}
     else
       {:noreply, socket}
     end
@@ -298,4 +344,5 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
 
   defp page_title(:variable_loadout), do: "Script - Variable Loadouts"
   defp page_title(:load_out), do: "Script - Load Loadout"
+  defp page_title(:delete_loadout), do: "Script - Delete a Loadout"
 end

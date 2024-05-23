@@ -33,7 +33,7 @@ Hooks.Flash = {
         { transform: "scale(0)" },
       ],
       {
-        duration: 2000,
+        duration: 4000,
         fill: "forwards"
       },
     )
@@ -47,7 +47,7 @@ Hooks.Flash = {
         { transform: "scale(0)" },
       ],
       {
-        duration: 2000,
+        duration: 4000,
         fill: "forwards"
       },
     )
@@ -67,7 +67,6 @@ window.addEventListener("phx:page-loading-start", _info => topbar.show(300))
 window.addEventListener("phx:page-loading-stop", _info => topbar.hide())
 
 window.addEventListener("phx:focus-to-element-with-id", (e) => {
-  console.log(e.detail.id)
   const target = document.getElementById(e.detail.id)
 
   if (target) {
@@ -150,19 +149,6 @@ window.addEventListener("phx:get-screen-to-middle-for-editor", () => {
     // what im gonna do is give it 5 lines from myself, meaning minus
     window.scrollTo({ top: absoluteTopPositionOfTextarea - (24 * 5) + substrLineCount * 24, behavior: 'smooth' })
   }
-})
-
-window.addEventListener("phx:add-tabindexes-to-scripts", () => {
-  // first we get all the script-* trs
-  const scripts = document.querySelectorAll('[id^="script"]')
-
-  scripts.forEach((script) => {
-    script.setAttribute("tabindex", (script.id.split("-")[1]))
-    script.setAttribute("aa", (script.id.split("-")[1]))
-    console.log(script)
-  })
-
-
 })
 
 // connect if there are any LiveViews on the page

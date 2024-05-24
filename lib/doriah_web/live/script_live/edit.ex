@@ -11,7 +11,7 @@ defmodule DoriahWeb.ScriptLive.Edit do
 
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
-    script = Scripting.get_script_with_variables!(id)
+    script = Scripting.get_script_with_loadouts!(id)
 
     {:noreply,
      socket

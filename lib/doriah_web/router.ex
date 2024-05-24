@@ -51,7 +51,8 @@ defmodule DoriahWeb.Router do
         ScriptController,
         :get_script_with_applied_loadout
 
-    get "/scripts/as_sh_file/:id", ScriptController, :get_script_download
+    get "/scripts/export/as_sh/:id", ScriptController, :export_as_sh
+    get "/scripts/export/as_doriah/:id", ScriptController, :export_as_doriah
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

@@ -10,7 +10,13 @@ defmodule DoriahWeb.ScriptController do
     text(conn, Scripting.get_script_as_sh_file_with_loadout(params))
   end
 
-  def get_script_download(conn, params) do
+  def export_as_sh(conn, params) do
     send_download(conn, {:binary, Scripting.get_script_as_sh_file(params)}, filename: "script.sh")
+  end
+
+  def export_as_doriah(conn, params) do
+    send_download(conn, {:binary, Scripting.export_as_doriah(params)},
+      filename: "script#{params["id"]}.doriah"
+    )
   end
 end

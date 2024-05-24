@@ -12,7 +12,7 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
   end
 
   def handle_params(%{"id" => id, "loadout_id" => loadout_id}, _, socket) do
-    script = Scripting.get_script_with_variables!(id)
+    script = Scripting.get_script_with_loadouts!(id)
     loadout = VariableManagement.get_loadout!(script.id, loadout_id)
 
     compatible_variables =
@@ -33,7 +33,7 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
   end
 
   def handle_params(%{"id" => id}, _, socket) do
-    script = Scripting.get_script_with_variables!(id)
+    script = Scripting.get_script_with_loadouts!(id)
 
     {:noreply,
      socket

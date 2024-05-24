@@ -45,14 +45,14 @@ defmodule Doriah.Scripting do
 
   ## Examples
 
-      iex> get_script_with_variables(123)
+      iex> get_script_with_loadouts!(123)
       %Script{}
 
-      iex> get_script_with_variables!(456)
+      iex> get_script_with_loadouts!(456)
       ** (Ecto.NoResultsError)
 
   """
-  def get_script_with_variables!(id) do
+  def get_script_with_loadouts!(id) do
     Repo.get!(Script, id)
     |> Repo.preload(:loadouts)
   end
@@ -137,7 +137,7 @@ defmodule Doriah.Scripting do
   end
 
   def get_script_as_sh_file(params) do
-    script = get_script_with_variables!(params["id"])
+    script = get_script_with_loadouts!(params["id"])
 
     other_param_keys = Map.keys(params) |> Enum.filter(fn param_key -> param_key != "id" end)
 
@@ -154,7 +154,7 @@ defmodule Doriah.Scripting do
   end
 
   def get_script_as_sh_file_with_loadout(params) do
-    script = get_script_with_variables!(params["id"])
+    script = get_script_with_loadouts!(params["id"])
     loadout = VariableManagement.get_loadout!(params["id"], params["loadout_id"])
 
     other_param_keys =
@@ -205,5 +205,65 @@ defmodule Doriah.Scripting do
 
       fill_content_with_variables(mutated_content, remaining_map)
     end
+  end
+
+  def export_as_doriah(params) do
+    script = get_script_with_loadouts!(params["id"])
+
+    """
+    !![script]!!
+    """
+    |> add_basic_info_to_doriah_file(script.title, script.description)
+    |> add_whole_script_to_doriah_file(script.whole_script)
+    |> add_loadouts_to_doriah_file(script.loadouts)
+    |> add_end_to_doriah_file()
+  end
+
+  defp add_basic_info_to_doriah_file(cumulate_binary, script_title, script_description) do
+    """
+    #{cumulate_binary}
+    !!![basic_info]!!!
+    title: #{script_title}
+    script_description: #{script_description}
+    +++[basic_info]+++
+    """
+  end
+
+  defp add_whole_script_to_doriah_file(cumulative_binary, whole_script) do
+    """
+    #{cumulative_binary}
+    !!![whole_script]!!!
+    #{whole_script}
+    +++[whole_script]+++
+    """
+  end
+
+  defp add_loadouts_to_doriah_file(cumulate_binary, loadouts) do
+    doriah_compatible_loadout_list =
+      Enum.reduce(Enum.reverse(loadouts), "", fn loadout, acc ->
+        """
+        #{acc}
+        !!!![loadout]!!!!
+        title: #{loadout.title}
+        variables: #{Enum.reduce(Enum.reverse(loadout.variables), "", fn variable, acc -> "#{acc}#{variable["key"]} => #{variable["value"]},,," end)}
+        ++++[loadout]++++
+        """
+      end)
+
+    IO.inspect(doriah_compatible_loadout_list)
+
+    """
+    #{cumulate_binary}
+    !!![loadouts]!!!
+    #{doriah_compatible_loadout_list}
+    +++[loadouts]+++
+    """
+  end
+
+  defp add_end_to_doriah_file(cumulative_binary) do
+    """
+    #{cumulative_binary}
+    ++[script]++
+    """
   end
 end

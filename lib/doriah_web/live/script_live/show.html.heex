@@ -84,11 +84,37 @@
       </div>
     </div>
 
-    <a href={~p"/api/scripts/as_sh_file/#{@script}"} target="_blank" class="flex">
-      <.button id={"download-#{@script.id}"} class="flex w-full justify-center gap-4">
-        Download as .sh file <.icon name="hero-arrow-down-tray" />
-      </.button>
-    </a>
+    <div class="p-2 border-2 border-black">
+      <h4 class="text-lg underline font-bold mb-2 text-center">
+        Export
+      </h4>
+
+      <div class="flex flex-col md:flex-row gap-2">
+        <div class="flex md:w-1/2 gap-4 justify-center">
+          <a
+            href={~p"/api/scripts/export/as_doriah/#{@script}"}
+            target="_blank"
+            class="flex w-full justify-center gap-4"
+          >
+            <.button id={"download-#{@script.id}"} class="w-full">
+              as .doriah file <.icon name="hero-arrow-down-tray" />
+            </.button>
+          </a>
+        </div>
+
+        <div class="flex md:w-1/2 gap-4 justify-center">
+          <a
+            href={~p"/api/scripts/export/as_sh/#{@script}"}
+            target="_blank"
+            class="flex w-full justify-center gap-4"
+          >
+            <.button id={"download-#{@script.id}"} class="w-full">
+              as .sh file(without loadout) <.icon name="hero-arrow-down-tray" />
+            </.button>
+          </a>
+        </div>
+      </div>
+    </div>
 
     <.link patch={~p"/scripts/#{@script}/select_loadout"} phx-click={JS.push_focus()}>
       <.button id={"download-#{@script.id}"} class="flex w-full justify-center gap-4">

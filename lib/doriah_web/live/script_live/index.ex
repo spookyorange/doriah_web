@@ -15,16 +15,21 @@ defmodule DoriahWeb.ScriptLive.Index do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
+  defp apply_action(socket, :index, _params) do
+    socket
+    |> assign(:page_title, "Scripts")
+    |> assign(:script, nil)
+  end
+
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "Scripts - Create")
     |> assign(:script, %Script{})
   end
 
-  defp apply_action(socket, :index, _params) do
+  defp apply_action(socket, :import, _params) do
     socket
-    |> assign(:page_title, "Scripts")
-    |> assign(:script, nil)
+    |> assign(:page_title, "Scripts - Import")
   end
 
   @impl true
@@ -57,6 +62,16 @@ defmodule DoriahWeb.ScriptLive.Index do
       {:noreply,
        socket
        |> push_navigate(to: ~p"/scripts/new")}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("keydown", %{"key" => "i"}, socket) do
+    if socket.assigns.keyboarder do
+      {:noreply,
+       socket
+       |> push_navigate(to: ~p"/scripts/import")}
     else
       {:noreply, socket}
     end

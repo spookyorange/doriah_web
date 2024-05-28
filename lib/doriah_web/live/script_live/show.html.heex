@@ -108,7 +108,7 @@
             target="_blank"
             class="flex w-full justify-center gap-4"
           >
-            <.button id={"download-#{@script.id}"} class="w-full">
+            <.button id={"download-#{@script.id}-wget"} class="w-full">
               as .sh file(without loadout) <.icon name="hero-arrow-down-tray" />
             </.button>
           </a>
@@ -117,7 +117,7 @@
     </div>
 
     <.link patch={~p"/scripts/#{@script}/select_loadout"} phx-click={JS.push_focus()}>
-      <.button id={"download-#{@script.id}"} class="flex w-full justify-center gap-4">
+      <.button class="flex w-full justify-center gap-4">
         <.controlful_indicator_powered_paragraph
           name="Load Loadout"
           char="l"

@@ -74,7 +74,6 @@ window.addEventListener("phx:focus-to-element-with-id", (e) => {
   }
 })
 
-
 window.addEventListener("phx:set-focus-to-eol", (e) => {
   const target = document.querySelector(`#${e.detail.id} input`)
 

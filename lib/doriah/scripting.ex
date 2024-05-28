@@ -75,6 +75,13 @@ defmodule Doriah.Scripting do
     |> Repo.insert()
   end
 
+  def create_script_with_loadout_assoc(attrs \\ %{}) do
+    %Script{}
+    |> Script.changeset(attrs)
+    |> Ecto.Changeset.cast_assoc(:loadouts)
+    |> Repo.insert()
+  end
+
   @doc """
   Updates a script.
 
@@ -250,8 +257,6 @@ defmodule Doriah.Scripting do
         """
       end)
 
-    IO.inspect(doriah_compatible_loadout_list)
-
     """
     #{cumulate_binary}
     !!![loadouts]!!!
@@ -265,5 +270,14 @@ defmodule Doriah.Scripting do
     #{cumulative_binary}
     ++[script]++
     """
+  end
+
+  def import_from_file(importable_map) do
+    create_script_with_loadout_assoc(%{
+      title: importable_map |> Map.get(:title),
+      description: importable_map |> Map.get(:description),
+      whole_script: importable_map |> Map.get(:whole_script),
+      loadouts: importable_map |> Map.get(:loadouts)
+    })
   end
 end

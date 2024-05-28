@@ -7,6 +7,10 @@
 # General application configuration
 import Config
 
+config :mime, :types, %{
+  "application/vnd.api+json" => ["json-api", "doriah"]
+}
+
 config :doriah,
   ecto_repos: [Doriah.Repo],
   generators: [timestamp_type: :utc_datetime]

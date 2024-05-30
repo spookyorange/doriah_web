@@ -10,6 +10,59 @@ defmodule DoriahWeb.ScriptLive.Show do
     {:ok, socket |> assign_controlful()}
   end
 
+  attr :status, :string, required: true
+
+  def status_indicator(assigns) do
+    ~H"""
+    <.beautiful_section>
+      <:title>
+        Status
+      </:title>
+      <div class="flex w-full justify-center gap-2">
+        <p>
+          <%= Scripting.status_name_to_displayable_name(@status) %>
+        </p>
+        <.status_symbol status={@status} />
+      </div>
+    </.beautiful_section>
+    """
+  end
+
+  attr :status, :string, required: true
+
+  def status_symbol(assigns) do
+    ~H"""
+    <%= case @status do %>
+      <% :under_development -> %>
+        <div title="Under development">
+          <.icon name="hero-cog" />
+        </div>
+      <% :untested_usable -> %>
+        <div title="Not tested yet, but usable!">
+          <.icon name="hero-question-mark-circle" />
+        </div>
+      <% :stable -> %>
+        <div title="Stable, ready to go!!">
+          <.icon name="hero-check-badge" />
+        </div>
+      <% :deprecated -> %>
+        <div title="Deprecated, maybe the maintainer left a note?">
+          <.icon name="hero-document-minus" />
+        </div>
+      <% :discounted -> %>
+        <div title="Discounted, please don't use this">
+          <.icon name="hero-no-symbol" />
+        </div>
+      <% :just_imported -> %>
+        <div title="Imported just now, you might want to wait a bit before using this">
+          <.icon name="hero-arrow-down-on-square" />
+        </div>
+      <% _ -> %>
+        unknown
+    <% end %>
+    """
+  end
+
   @impl true
   def handle_params(%{"id" => id, "loadout_id" => loadout_id}, _, socket) do
     script = Scripting.get_script_with_loadouts!(id)

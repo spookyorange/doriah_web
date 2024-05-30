@@ -39,15 +39,16 @@
 
 <div class="my-8 flex flex-col">
   <div class="flex mb-2 flex-col gap-2">
-    <div class="p-2 border-2 border-black">
-      <h4 class="text-lg underline font-bold mb-2 text-center">
+    <.status_indicator status={@script.status} />
+    <.beautiful_section>
+      <:title>
         Copy API link
         <%= if(@loadout != nil) do %>
           <span class="font-extrabold">
             /w loadout: <%= @loadout.title %>
           </span>
         <% end %>
-      </h4>
+      </:title>
       <div class="flex flex-col md:flex-row gap-2">
         <.button
           class="flex grow gap-4 justify-center"
@@ -82,13 +83,10 @@
       <div class="bg-zinc-900 text-white p-2 mt-2 rounded-xl flex gap-2 justify-center items-center">
         <.icon name="hero-information-circle" />Tip: you may add params to the end to override variables(like ?x=y)
       </div>
-    </div>
+    </.beautiful_section>
 
-    <div class="p-2 border-2 border-black">
-      <h4 class="text-lg underline font-bold mb-2 text-center">
-        Export
-      </h4>
-
+    <.beautiful_section>
+      <:title>Export</:title>
       <div class="flex flex-col md:flex-row gap-2">
         <div class="flex md:w-1/2 gap-4 justify-center">
           <a
@@ -114,7 +112,7 @@
           </a>
         </div>
       </div>
-    </div>
+    </.beautiful_section>
 
     <.link patch={~p"/scripts/#{@script}/select_loadout"} phx-click={JS.push_focus()}>
       <.button class="flex w-full justify-center gap-4">

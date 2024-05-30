@@ -45,7 +45,10 @@ defmodule DoriahWeb.ScriptLive.Index do
       class="flex justify-between p-4 rounded-xl bg-gray-950 text-white focus-visible:ring-zinc-500 focus-visible:ring-8"
       tabindex="-1"
     >
-      <%= @script.title %>
+      <div class="flex items-center gap-2">
+        <%= @script.title %>
+        <DoriahWeb.ScriptLive.Show.status_symbol status={@script.status} />
+      </div>
       <.link
         patch={~p"/scripts/#{@script}"}
         class="flex align-center gap-2 bg-gray-950 text-white focus-visible:ring-zinc-500 focus-visible:ring-8"

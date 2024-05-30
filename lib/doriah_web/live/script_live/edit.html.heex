@@ -38,6 +38,7 @@
 <.controlful_panel controlful={@controlful} keyboarder={@keyboarder} />
 
 <div class="my-8 flex flex-col gap-2">
+  <DoriahWeb.ScriptLive.Show.status_indicator status={@script.status} />
   <.link class="w-full" patch={~p"/scripts/#{@script}/edit_mode/change_status"}>
     <.button class="w-full">
       <.controlful_indicator_powered_paragraph

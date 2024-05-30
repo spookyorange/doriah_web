@@ -10,7 +10,7 @@ defmodule DoriahWeb.ScriptLive.Show do
     {:ok, socket |> assign_controlful()}
   end
 
-  attr :status, :string, required: true
+  attr :script, :any, required: true
 
   def status_indicator(assigns) do
     ~H"""
@@ -20,12 +20,34 @@ defmodule DoriahWeb.ScriptLive.Show do
       </:title>
       <div class="flex w-full justify-center gap-2">
         <p>
-          <%= Scripting.status_name_to_displayable_name(@status) %>
+          <%= Scripting.status_name_to_displayable_name(@script.status) %>
         </p>
-        <.status_symbol status={@status} />
+        <.status_symbol status={@script.status} />
+      </div>
+      <div
+        :if={@script.status == :deprecated && @script.deprecated_suggestion_link}
+        class="flex w-full justify-center"
+      >
+        Author left this link: "
+        <.link
+          target="_blank"
+          href={fix_deprecation_link(@script.deprecated_suggestion_link)}
+          class="text-orange-700"
+        >
+          <%= fix_deprecation_link(@script.deprecated_suggestion_link) %>
+        </.link>
+        "
       </div>
     </.beautiful_section>
     """
+  end
+
+  defp fix_deprecation_link(the_link) do
+    unless the_link |> String.starts_with?("http") || the_link |> String.starts_with?("https") do
+      "https://#{the_link}"
+    else
+      the_link
+    end
   end
 
   attr :status, :string, required: true

@@ -1,5 +1,6 @@
-defmodule DoriahWeb.ScriptLive.ChangeStatus do
+defmodule DoriahWeb.ScriptLive.EditModules.ChangeStatus do
   use DoriahWeb, :live_component
+
   alias Doriah.Scripting
 
   def render(assigns) do

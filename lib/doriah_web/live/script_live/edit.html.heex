@@ -38,7 +38,21 @@
 <.controlful_panel controlful={@controlful} keyboarder={@keyboarder} />
 
 <div class="my-8 flex flex-col gap-2">
-  <DoriahWeb.ScriptLive.Show.status_indicator status={@script.status} />
+  <DoriahWeb.ScriptLive.Show.status_indicator script={@script} />
+  <.link
+    :if={@script.status == :deprecated}
+    class="w-full"
+    patch={~p"/scripts/#{@script}/edit_mode/change_deprecation_suggestion_link"}
+  >
+    <.button class="w-full">
+      <.controlful_indicator_powered_paragraph
+        name="Change Deprecation Suggestion Link"
+        char="d"
+        keyboarder={@keyboarder}
+      />
+    </.button>
+  </.link>
+
   <.link class="w-full" patch={~p"/scripts/#{@script}/edit_mode/change_status"}>
     <.button class="w-full">
       <.controlful_indicator_powered_paragraph
@@ -97,7 +111,21 @@
     on_cancel={JS.patch(~p"/scripts/#{@script}/edit_mode")}
   >
     <.live_component
-      module={DoriahWeb.ScriptLive.ChangeStatus}
+      module={DoriahWeb.ScriptLive.EditModules.ChangeStatus}
+      id={@script.id}
+      script={@script}
+      patch={~p"/scripts/#{@script}/edit_mode"}
+    />
+  </.modal>
+
+  <.modal
+    :if={@live_action == :change_deprecation_suggestion_link}
+    id="script-change-status"
+    show
+    on_cancel={JS.patch(~p"/scripts/#{@script}/edit_mode")}
+  >
+    <.live_component
+      module={DoriahWeb.ScriptLive.EditModules.ChangeDeprecationSuggestionLink}
       id={@script.id}
       script={@script}
       patch={~p"/scripts/#{@script}/edit_mode"}

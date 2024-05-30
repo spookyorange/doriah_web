@@ -39,6 +39,10 @@ defmodule DoriahWeb.ScriptLive.Edit do
     socket
   end
 
+  defp apply_action(socket, :change_deprecation_suggestion_link, _script) do
+    socket
+  end
+
   defp get_row_count_of_textarea(area_value) do
     String.split(area_value, "\n") |> length()
   end
@@ -75,6 +79,24 @@ defmodule DoriahWeb.ScriptLive.Edit do
      |> put_flash(
        :info,
        "Status is successfully set to: #{Scripting.status_name_to_displayable_name(updated_one.status)}"
+     )
+     |> push_patch(to: ~p"/scripts/#{socket.assigns.script}/edit_mode")}
+  end
+
+  def handle_event(
+        "change_deprecation_suggestion_link",
+        %{"deprecation_suggestion_link" => the_link},
+        socket
+      ) do
+    {:ok, updated_one} =
+      Scripting.update_script(socket.assigns.script, %{deprecated_suggestion_link: the_link})
+
+    {:noreply,
+     socket
+     |> clear_flash()
+     |> put_flash(
+       :info,
+       "Suggestion link is successfully set to: #{updated_one.deprecated_suggestion_link}"
      )
      |> push_patch(to: ~p"/scripts/#{socket.assigns.script}/edit_mode")}
   end
@@ -129,6 +151,19 @@ defmodule DoriahWeb.ScriptLive.Edit do
     end
   end
 
+  def handle_event("keydown", %{"key" => "d"}, socket) do
+    if socket.assigns.keyboarder && socket.assigns.live_action == :edit_mode &&
+         socket.assigns.script.status == :deprecated do
+      {:noreply,
+       socket
+       |> push_navigate(
+         to: ~p"/scripts/#{socket.assigns.script}/edit_mode/change_deprecation_suggestion_link"
+       )}
+    else
+      {:noreply, socket}
+    end
+  end
+
   def handle_event("keydown", %{"key" => "s"}, socket) do
     if socket.assigns.keyboarder && socket.assigns.live_action == :edit_mode do
       {:noreply,
@@ -176,4 +211,7 @@ defmodule DoriahWeb.ScriptLive.Edit do
   defp page_title(:edit_mode), do: "Script - Edit"
   defp page_title(:basic_info), do: "Script - Edit Basic Information"
   defp page_title(:change_status), do: "Script - Change Status"
+
+  defp page_title(:change_deprecation_suggestion_link),
+    do: "Script - Change Deprecation Suggestion Link"
 end

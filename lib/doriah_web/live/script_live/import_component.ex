@@ -69,21 +69,13 @@ defmodule DoriahWeb.ScriptLive.ImportComponent do
     # now that we have the data as binary, we need to make sure that it's valid, by just checking the first row
     if String.starts_with?(file_data_as_binary, "!![script]!!") do
       basic_info_part =
-        strip_a_part_of_import(file_data_as_binary, "!!![basic_info]!!!", "+++[basic_info]+++")
+        strip_standardized_part_of_given_string(file_data_as_binary, "basic_info")
 
       whole_script_part =
-        strip_a_part_of_import(
-          file_data_as_binary,
-          "!!![whole_script]!!!",
-          "+++[whole_script]+++"
-        )
+        strip_standardized_part_of_given_string(file_data_as_binary, "whole_script")
 
       loadouts_part =
-        strip_a_part_of_import(
-          file_data_as_binary,
-          "!!![loadouts]!!!",
-          "+++[loadouts]+++"
-        )
+        strip_standardized_part_of_given_string(file_data_as_binary, "loadouts")
 
       {:noreply,
        socket
@@ -108,6 +100,10 @@ defmodule DoriahWeb.ScriptLive.ImportComponent do
        )
        |> assign(:seems_valid, true)}
     end
+  end
+
+  defp strip_standardized_part_of_given_string(whole_data, tha_string) do
+    strip_a_part_of_import(whole_data, "!!![#{tha_string}]!!!", "+++[#{tha_string}]+++")
   end
 
   defp strip_a_part_of_import(whole_data, start_of_it, end_of_it) do

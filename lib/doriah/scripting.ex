@@ -277,7 +277,8 @@ defmodule Doriah.Scripting do
       title: importable_map |> Map.get(:title),
       description: importable_map |> Map.get(:description),
       whole_script: importable_map |> Map.get(:whole_script),
-      loadouts: importable_map |> Map.get(:loadouts)
+      loadouts: importable_map |> Map.get(:loadouts),
+      status: :just_imported
     })
   end
 

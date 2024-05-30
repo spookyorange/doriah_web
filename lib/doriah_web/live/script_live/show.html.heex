@@ -136,14 +136,11 @@
   </p>
   <div class="flex">
     <div class="w-full bg-zinc-950 text-white p-4">
-      <p :for={
-        line <-
-          String.split(
-            DoriahWeb.ScriptLive.Show.fill_variables_to_script(@whole_script, @loadout),
-            "\n"
-          )
-      }>
-        <%= line %>
+      <p class="whitespace-pre-line mt-[-24px] overflow-x-auto text-nowrap">
+        <%= DoriahWeb.ScriptLive.Show.fill_variables_to_script(
+          @whole_script,
+          @loadout
+        ) %>
       </p>
     </div>
   </div>

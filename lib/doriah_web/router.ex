@@ -40,6 +40,7 @@ defmodule DoriahWeb.Router do
 
     live "/scripts/:id/edit_mode", ScriptLive.Edit, :edit_mode
     live "/scripts/:id/edit_mode/basic_info", ScriptLive.Edit, :basic_info
+    live "/scripts/:id/edit_mode/change_status", ScriptLive.Edit, :change_status
   end
 
   # Other scopes may use custom stacks.

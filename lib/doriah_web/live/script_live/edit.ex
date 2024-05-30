@@ -35,6 +35,10 @@ defmodule DoriahWeb.ScriptLive.Edit do
     socket
   end
 
+  defp apply_action(socket, :change_status, _script) do
+    socket
+  end
+
   defp get_row_count_of_textarea(area_value) do
     String.split(area_value, "\n") |> length()
   end
@@ -59,6 +63,20 @@ defmodule DoriahWeb.ScriptLive.Edit do
      |> assign(:whole_script_as_input_height, get_row_count_of_textarea(new_value))
      |> assign(:unsaved_changes_for_whole_script, whole_script_changed)
      |> push_event("get-screen-to-middle-for-editor", %{})}
+  end
+
+  def handle_event("change_status", %{"status" => status_to_change}, socket) do
+    {:ok, updated_one} =
+      Scripting.update_script(socket.assigns.script, %{status: status_to_change})
+
+    {:noreply,
+     socket
+     |> clear_flash()
+     |> put_flash(
+       :info,
+       "Status is successfully set to: #{Scripting.status_name_to_displayable_name(updated_one.status)}"
+     )
+     |> push_patch(to: ~p"/scripts/#{socket.assigns.script}/edit_mode")}
   end
 
   def handle_event("save_whole_script", _params, socket) do
@@ -96,6 +114,16 @@ defmodule DoriahWeb.ScriptLive.Edit do
       {:noreply,
        socket
        |> push_event("focus-on-id-textarea-and-focus-end", %{"id" => "whole-script[itself]"})}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("keydown", %{"key" => "c"}, socket) do
+    if socket.assigns.keyboarder && socket.assigns.live_action == :edit_mode do
+      {:noreply,
+       socket
+       |> push_navigate(to: ~p"/scripts/#{socket.assigns.script}/edit_mode/change_status")}
     else
       {:noreply, socket}
     end
@@ -147,4 +175,5 @@ defmodule DoriahWeb.ScriptLive.Edit do
 
   defp page_title(:edit_mode), do: "Script - Edit"
   defp page_title(:basic_info), do: "Script - Edit Basic Information"
+  defp page_title(:change_status), do: "Script - Change Status"
 end

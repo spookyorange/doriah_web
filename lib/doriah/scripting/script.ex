@@ -7,6 +7,19 @@ defmodule Doriah.Scripting.Script do
     field :title, :string
     field :whole_script, :string, default: ""
 
+    field :status, Ecto.Enum,
+      values: [
+        :under_development,
+        :untested_usable,
+        :stable,
+        :deprecated,
+        :discounted,
+        :just_imported
+      ],
+      default: :under_development
+
+    field :deprecated_suggestion_link, :string
+
     has_many :loadouts, Doriah.VariableManagement.Loadout
 
     timestamps(type: :utc_datetime)
@@ -15,7 +28,7 @@ defmodule Doriah.Scripting.Script do
   @doc false
   def changeset(script, attrs) do
     script
-    |> cast(attrs, [:title, :description, :whole_script])
+    |> cast(attrs, [:title, :description, :whole_script, :status, :deprecated_suggestion_link])
     |> validate_required([:title, :description])
   end
 end

@@ -280,4 +280,16 @@ defmodule Doriah.Scripting do
       loadouts: importable_map |> Map.get(:loadouts)
     })
   end
+
+  def status_name_to_displayable_name(status) do
+    case status do
+      :under_development -> "Under Development"
+      :untested_usable -> "Untested Stable"
+      :stable -> "Stable"
+      :deprecated -> "Deprecated"
+      :discounted -> "Discounted"
+      :just_imported -> "Just Imported"
+      _ -> "Unknown"
+    end
+  end
 end

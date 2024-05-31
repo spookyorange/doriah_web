@@ -19,7 +19,7 @@ defmodule Doriah.Scripting do
 
   """
   def list_scripts do
-    Repo.all(Script)
+    Repo.all(from s in Script, where: s.listed == true, order_by: [desc: s.inserted_at])
   end
 
   @doc """

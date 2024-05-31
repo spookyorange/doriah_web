@@ -39,19 +39,39 @@
 
 <div class="my-8 flex flex-col gap-2">
   <DoriahWeb.ScriptLive.Show.status_indicator script={@script} />
-  <.link
-    :if={@script.status == :deprecated}
-    class="w-full"
-    patch={~p"/scripts/#{@script}/edit_mode/change_deprecation_suggestion_link"}
-  >
-    <.button class="w-full">
-      <.controlful_indicator_powered_paragraph
-        name="Change Deprecation Suggestion Link"
-        char="d"
-        keyboarder={@keyboarder}
-      />
-    </.button>
-  </.link>
+  <.beautiful_section :if={@script.status == :deprecated}>
+    <:title>Deprecation Specials!</:title>
+    <div class="flex flex-col gap-4 items-center">
+      <.link
+        class="w-full"
+        patch={~p"/scripts/#{@script}/edit_mode/change_deprecation_suggestion_link"}
+      >
+        <.button class="w-full">
+          <.controlful_indicator_powered_paragraph
+            name="Change Deprecation Suggestion Link"
+            char="d"
+            keyboarder={@keyboarder}
+          />
+        </.button>
+      </.link>
+      <div :if={@script.listed} class="w-full flex flex-col gap-2 items-center">
+        You also might want to unlist this, do it by editing the Script
+        <.link
+          patch={~p"/scripts/#{@script}/edit_mode/basic_info"}
+          phx-click={JS.push_focus()}
+          class="w-full"
+        >
+          <.button class="w-full">
+            <.controlful_indicator_powered_paragraph
+              name="Edit Basic Info"
+              char="e"
+              keyboarder={@keyboarder}
+            />
+          </.button>
+        </.link>
+      </div>
+    </div>
+  </.beautiful_section>
 
   <.link class="w-full" patch={~p"/scripts/#{@script}/edit_mode/change_status"}>
     <.button class="w-full">

@@ -11,25 +11,42 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
     {:ok, socket |> assign_controlful()}
   end
 
-  def handle_params(%{"id" => id, "loadout_id" => loadout_id}, _, socket) do
-    script = Scripting.get_script_with_loadouts!(id)
-    loadout = VariableManagement.get_loadout!(script.id, loadout_id)
+  def handle_params(%{"id" => id, "loadout_title" => loadout_title}, _, socket) do
+    try do
+      script = Scripting.get_script_with_loadouts!(id)
 
-    compatible_variables =
-      Enum.map(loadout.variables, fn variable ->
-        %{key: variable["key"], value: variable["value"], index: variable["index"]}
-      end)
+      try do
+        loadout = VariableManagement.get_loadout_by_title!(script.id, loadout_title)
 
-    {:noreply,
-     socket
-     |> assign(:page_title, page_title(socket.assigns.live_action))
-     |> assign(:script, script)
-     |> assign(:loadout, loadout)
-     |> assign(:whole_script, script.whole_script)
-     |> assign(:currently_applied_loadout_title, loadout.title)
-     |> load_all_variables_to_ram(compatible_variables)
-     |> assign(:saveable, false)
-     |> apply_action(socket.assigns.live_action, script)}
+        compatible_variables =
+          Enum.map(loadout.variables, fn variable ->
+            %{key: variable["key"], value: variable["value"], index: variable["index"]}
+          end)
+
+        {:noreply,
+         socket
+         |> assign(:page_title, page_title(socket.assigns.live_action))
+         |> assign(:script, script)
+         |> assign(:loadout, loadout)
+         |> assign(:whole_script, script.whole_script)
+         |> assign(:currently_applied_loadout_title, loadout.title)
+         |> load_all_variables_to_ram(compatible_variables)
+         |> assign(:saveable, false)
+         |> apply_action(socket.assigns.live_action, script)}
+      rescue
+        _e in _ ->
+          {:noreply,
+           socket
+           |> push_navigate(to: ~p"/scripts/#{script}/variable_loadout")
+           |> put_flash(:error, "Loadout not found")}
+      end
+    rescue
+      _e in _ ->
+        {:noreply,
+         socket
+         |> push_navigate(to: ~p"/scripts")
+         |> put_flash(:error, "No clue how you got here, but no script nor a loadout is found")}
+    end
   end
 
   def handle_params(%{"id" => id}, _, socket) do

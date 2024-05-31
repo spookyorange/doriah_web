@@ -86,35 +86,56 @@ defmodule DoriahWeb.ScriptLive.Show do
   end
 
   @impl true
-  def handle_params(%{"id" => id, "loadout_id" => loadout_id}, _, socket) do
-    script = Scripting.get_script_with_loadouts!(id)
-    loadout = VariableManagement.get_loadout!(id, loadout_id)
+  def handle_params(%{"id" => id, "loadout_title" => loadout_title}, _, socket) do
+    try do
+      script = Scripting.get_script_with_loadouts!(id)
 
-    {:noreply,
-     socket
-     |> assign(:page_title, page_title(socket.assigns.live_action))
-     |> assign(:script, script)
-     |> assign(:loadout, loadout)
-     |> assign(
-       :script_sh_url,
-       url(~p"/api/scripts/as_sh/#{script}/with_applied_loadout/#{loadout}")
-     )
-     |> assign(:whole_script, script.whole_script)
-     |> apply_action(socket.assigns.live_action, script)}
+      try do
+        loadout = VariableManagement.get_loadout_by_title!(id, loadout_title)
+
+        {:noreply,
+         socket
+         |> assign(:page_title, page_title(socket.assigns.live_action))
+         |> assign(:script, script)
+         |> assign(:loadout, loadout)
+         |> assign(
+           :script_sh_url,
+           url(~p"/api/scripts/as_sh/#{script}/with_applied_loadout/#{loadout}")
+         )
+         |> assign(:whole_script, script.whole_script)
+         |> apply_action(socket.assigns.live_action, script)}
+      rescue
+        _ ->
+          {:noreply,
+           socket
+           |> push_navigate(to: ~p"/scripts/#{script}")
+           |> put_flash(:error, "Loadout not found")}
+      end
+    rescue
+      _ ->
+        {:noreply,
+         socket |> push_navigate(to: ~p"/scripts") |> put_flash(:error, "Script not found")}
+    end
   end
 
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
-    script = Scripting.get_script_with_loadouts!(id)
+    try do
+      script = Scripting.get_script_with_loadouts!(id)
 
-    {:noreply,
-     socket
-     |> assign(:page_title, page_title(socket.assigns.live_action))
-     |> assign(:script, script)
-     |> assign(:loadout, nil)
-     |> assign(:script_sh_url, url(~p"/api/scripts/as_sh/#{script.id}"))
-     |> assign(:whole_script, script.whole_script)
-     |> apply_action(socket.assigns.live_action, script)}
+      {:noreply,
+       socket
+       |> assign(:page_title, page_title(socket.assigns.live_action))
+       |> assign(:script, script)
+       |> assign(:loadout, nil)
+       |> assign(:script_sh_url, url(~p"/api/scripts/as_sh/#{script.id}"))
+       |> assign(:whole_script, script.whole_script)
+       |> apply_action(socket.assigns.live_action, script)}
+    rescue
+      _ ->
+        {:noreply,
+         socket |> push_navigate(to: ~p"/scripts") |> put_flash(:error, "Script not found")}
+    end
   end
 
   defp apply_action(socket, :show, _script) do

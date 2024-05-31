@@ -34,38 +34,46 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
          |> assign(:saveable, false)
          |> apply_action(socket.assigns.live_action, script)}
       rescue
-        _e in _ ->
+        _ ->
           {:noreply,
            socket
            |> push_navigate(to: ~p"/scripts/#{script}/variable_loadout")
            |> put_flash(:error, "Loadout not found")}
       end
     rescue
-      _e in _ ->
+      _ ->
         {:noreply,
          socket
-         |> push_navigate(to: ~p"/scripts")
+         |> push_navigate(to: ~p"/")
          |> put_flash(:error, "No clue how you got here, but no script nor a loadout is found")}
     end
   end
 
   def handle_params(%{"id" => id}, _, socket) do
-    script = Scripting.get_script_with_loadouts!(id)
+    try do
+      script = Scripting.get_script_with_loadouts!(id)
 
-    {:noreply,
-     socket
-     |> assign(:page_title, page_title(socket.assigns.live_action))
-     |> assign(:script, script)
-     |> assign(:loadout, nil)
-     |> assign(:whole_script, script.whole_script)
-     |> assign(:currently_applied_loadout_title, "None")
-     |> assign(
-       :current_variables_in_ram,
-       []
-     )
-     |> assign(:currently_applied_variables, [])
-     |> assign(:saveable, false)
-     |> apply_action(socket.assigns.live_action, script)}
+      {:noreply,
+       socket
+       |> assign(:page_title, page_title(socket.assigns.live_action))
+       |> assign(:script, script)
+       |> assign(:loadout, nil)
+       |> assign(:whole_script, script.whole_script)
+       |> assign(:currently_applied_loadout_title, "None")
+       |> assign(
+         :current_variables_in_ram,
+         []
+       )
+       |> assign(:currently_applied_variables, [])
+       |> assign(:saveable, false)
+       |> apply_action(socket.assigns.live_action, script)}
+    rescue
+      _ ->
+        {:noreply,
+         socket
+         |> push_navigate(to: ~p"/")
+         |> put_flash(:error, "Script not found")}
+    end
   end
 
   defp apply_action(socket, :variable_loadout, _script) do

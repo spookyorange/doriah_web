@@ -113,8 +113,7 @@ defmodule DoriahWeb.ScriptLive.Show do
       end
     rescue
       _ ->
-        {:noreply,
-         socket |> push_navigate(to: ~p"/scripts") |> put_flash(:error, "Script not found")}
+        {:noreply, socket |> push_navigate(to: ~p"/") |> put_flash(:error, "Script not found")}
     end
   end
 
@@ -133,8 +132,7 @@ defmodule DoriahWeb.ScriptLive.Show do
        |> apply_action(socket.assigns.live_action, script)}
     rescue
       _ ->
-        {:noreply,
-         socket |> push_navigate(to: ~p"/scripts") |> put_flash(:error, "Script not found")}
+        {:noreply, socket |> push_navigate(to: ~p"/") |> put_flash(:error, "Script not found")}
     end
   end
 

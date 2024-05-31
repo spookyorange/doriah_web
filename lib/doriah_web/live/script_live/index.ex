@@ -24,7 +24,7 @@ defmodule DoriahWeb.ScriptLive.Index do
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "Scripts - Create")
-    |> assign(:script, %Script{})
+    |> assign(:script, %Script{listed: true})
   end
 
   defp apply_action(socket, :import, _params) do

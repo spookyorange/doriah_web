@@ -6,6 +6,7 @@ defmodule Doriah.Scripting.Script do
     field :description, :string
     field :title, :string
     field :whole_script, :string, default: ""
+    field :listed, :boolean
 
     field :status, Ecto.Enum,
       values: [
@@ -28,7 +29,14 @@ defmodule Doriah.Scripting.Script do
   @doc false
   def changeset(script, attrs) do
     script
-    |> cast(attrs, [:title, :description, :whole_script, :status, :deprecated_suggestion_link])
+    |> cast(attrs, [
+      :title,
+      :description,
+      :whole_script,
+      :status,
+      :deprecated_suggestion_link,
+      :listed
+    ])
     |> validate_required([:title, :description])
   end
 end

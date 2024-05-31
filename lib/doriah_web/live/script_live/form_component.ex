@@ -21,6 +21,7 @@ defmodule DoriahWeb.ScriptLive.FormComponent do
       >
         <.input field={@form[:title]} type="text" label="Title" />
         <.input field={@form[:description]} type="text" label="Description" />
+        <.input field={@form[:listed]} type="checkbox" label="Listed" />
         <:actions>
           <.button phx-disable-with="Saving...">Save Script</.button>
         </:actions>

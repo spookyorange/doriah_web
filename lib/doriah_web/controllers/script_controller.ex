@@ -7,7 +7,15 @@ defmodule DoriahWeb.ScriptController do
   end
 
   def get_script_with_applied_loadout(conn, params) do
-    text(conn, Scripting.get_script_as_sh_file_with_loadout(params))
+    try do
+      text(conn, Scripting.get_script_as_sh_file_with_loadout(params))
+    rescue
+      _ ->
+        text(conn, """
+        #!/usr/bin/env bash
+        echo error: Script id or Loadout title is not valid, please try again with valid values!
+        """)
+    end
   end
 
   def export_as_sh(conn, params) do

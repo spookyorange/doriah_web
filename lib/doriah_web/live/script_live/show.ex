@@ -100,7 +100,7 @@ defmodule DoriahWeb.ScriptLive.Show do
          |> assign(:loadout, loadout)
          |> assign(
            :script_sh_url,
-           url(~p"/api/scripts/as_sh/#{script}/with_applied_loadout/#{loadout}")
+           url(~p"/api/scripts/as_sh/#{script}/with_applied_loadout/#{loadout.title}")
          )
          |> assign(:whole_script, script.whole_script)
          |> apply_action(socket.assigns.live_action, script)}

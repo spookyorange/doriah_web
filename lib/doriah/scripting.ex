@@ -4,7 +4,6 @@ defmodule Doriah.Scripting do
   """
 
   import Ecto.Query, warn: false
-  alias Doriah.VariableManagement
   alias Doriah.Repo
 
   alias Doriah.Scripting.Script
@@ -39,7 +38,7 @@ defmodule Doriah.Scripting do
   def get_script!(id), do: Repo.get!(Script, id)
 
   @doc """
-  Gets a single script w/variables.
+  Gets a single script w/variable loadout.
 
   Raises `Ecto.NoResultsError` if the Script does not exist.
 
@@ -55,6 +54,36 @@ defmodule Doriah.Scripting do
   def get_script_with_loadouts!(id) do
     Repo.get!(Script, id)
     |> Repo.preload(:loadouts)
+  end
+
+  @doc """
+  Gets a single script w/a variable loadout that we crave.
+
+  Raises `Ecto.NoResultsError` if the Script does not exist.
+
+  ## Examples
+
+      iex> get_script_with_a_specific_loadout!(123, world)
+      {script: %Script{}, loadout: %Loadout{}}
+
+      iex> get_script_with_a_specific_loadout!(456, hey)
+      ** (Ecto.NoResultsError)
+
+  """
+
+  def get_script_with_a_specific_loadout!(script_id, loadout_title) do
+    script_with_all_loadouts =
+      Repo.get!(Script, script_id)
+      |> Repo.preload(:loadouts)
+
+    loadout_we_want =
+      script_with_all_loadouts.loadouts
+      |> Enum.filter(fn loadout ->
+        loadout.title == loadout_title
+      end)
+      |> List.first()
+
+    %{script: script_with_all_loadouts, loadout: loadout_we_want}
   end
 
   @doc """
@@ -161,12 +190,12 @@ defmodule Doriah.Scripting do
   end
 
   def get_script_as_sh_file_with_loadout(params) do
-    script = get_script_with_loadouts!(params["id"])
-    loadout = VariableManagement.get_loadout!(params["id"], params["loadout_id"])
+    %{script: script, loadout: loadout} =
+      get_script_with_a_specific_loadout!(params["id"], params["loadout_title"])
 
     other_param_keys =
       Map.keys(params)
-      |> Enum.filter(fn param_key -> param_key != "id" || param_key != "loadout_id" end)
+      |> Enum.filter(fn param_key -> param_key != "id" || param_key != "loadout_title" end)
 
     half_baked_variables = loadout.variables |> standardize_variables() |> put_list_to_map()
 

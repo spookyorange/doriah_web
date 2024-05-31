@@ -41,17 +41,17 @@ defmodule Doriah.VariableManagement do
 
   @doc """
   Gets a single loadout by it's title & script id.
-                                                                                      
+
   Raises `Ecto.NoResultsError` if the Loadout does not exist.
-                                                                                      
+
   ## Examples
-                                                                                      
+
       iex> get_loadout_by_title!(1, default)
       %Loadout{}
-                                                                                      
+
       iex> get_loadout_by_title!(1, heya)
       ** (Ecto.NoResultsError)
-                                                                                      
+
   """
   def get_loadout_by_title!(script_id, title),
     do: Repo.one(from l in Loadout, where: l.title == ^title and l.script_id == ^script_id)

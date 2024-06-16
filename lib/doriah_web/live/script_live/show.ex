@@ -85,6 +85,15 @@ defmodule DoriahWeb.ScriptLive.Show do
     """
   end
 
+  defp common_assigns(socket, script) do
+    socket
+    |> assign(:page_title, page_title(socket.assigns.live_action))
+    |> assign(:script, script)
+    |> assign(:whole_script, script.whole_script)
+    |> assign(:bypassed, false)
+    |> apply_action(socket.assigns.live_action, script)
+  end
+
   @impl true
   def handle_params(%{"id" => id, "loadout_title" => loadout_title}, _, socket) do
     try do
@@ -95,15 +104,12 @@ defmodule DoriahWeb.ScriptLive.Show do
 
         {:noreply,
          socket
-         |> assign(:page_title, page_title(socket.assigns.live_action))
-         |> assign(:script, script)
+         |> common_assigns(script)
          |> assign(:loadout, loadout)
          |> assign(
            :script_sh_url,
            url(~p"/api/scripts/as_sh/#{script}/with_applied_loadout/#{loadout.title}")
-         )
-         |> assign(:whole_script, script.whole_script)
-         |> apply_action(socket.assigns.live_action, script)}
+         )}
       rescue
         _ ->
           {:noreply,
@@ -124,12 +130,9 @@ defmodule DoriahWeb.ScriptLive.Show do
 
       {:noreply,
        socket
-       |> assign(:page_title, page_title(socket.assigns.live_action))
-       |> assign(:script, script)
+       |> common_assigns(script)
        |> assign(:loadout, nil)
-       |> assign(:script_sh_url, url(~p"/api/scripts/as_sh/#{script.id}"))
-       |> assign(:whole_script, script.whole_script)
-       |> apply_action(socket.assigns.live_action, script)}
+       |> assign(:script_sh_url, url(~p"/api/scripts/as_sh/#{script.id}"))}
     rescue
       _ ->
         {:noreply, socket |> push_navigate(to: ~p"/") |> put_flash(:error, "Script not found")}
@@ -151,6 +154,16 @@ defmodule DoriahWeb.ScriptLive.Show do
   @impl true
   def handle_event("copy", %{"type" => type}, socket) do
     {:noreply, send_copy_script_link_command(socket, type)}
+  end
+
+  @impl true
+  def handle_event("bypass_advice", _, socket) do
+    {:noreply, bypass_advice(socket)}
+  end
+
+  @impl true
+  def handle_event("revert_advice", _, socket) do
+    {:noreply, revert_advice(socket)}
   end
 
   def handle_event("keydown", %{"key" => "e"}, socket) do
@@ -219,13 +232,50 @@ defmodule DoriahWeb.ScriptLive.Show do
     end
   end
 
+  def handle_event("keydown", %{"key" => "f"}, socket) do
+    if socket.assigns.keyboarder &&
+         socket.assigns.live_action == :show && socket.assigns.script.loadout_required do
+      {:noreply,
+       socket
+       |> bypass_advice()}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("keydown", %{"key" => "r"}, socket) do
+    if socket.assigns.keyboarder &&
+         socket.assigns.live_action == :show && socket.assigns.script.loadout_required do
+      {:noreply,
+       socket
+       |> revert_advice()}
+    else
+      {:noreply, socket}
+    end
+  end
+
   use DoriahWeb.BaseUtil.KeyboardSupport
 
+  defp bypass_advice(socket) do
+    socket |> assign(:bypassed, true)
+  end
+
+  defp revert_advice(socket) do
+    socket |> assign(:bypassed, false)
+  end
+
   def send_copy_script_link_command(socket, type) do
-    socket
-    |> push_event("copy-to-clipboard", %{"id" => "copy-#{socket.assigns.script.id}-#{type}"})
-    |> clear_flash()
-    |> put_flash(:info, "Copied as #{type} to clipboard!")
+    if socket.assigns.script.loadout_required && socket.assigns.loadout == nil &&
+         !socket.assigns.bypassed do
+      socket
+      |> clear_flash()
+      |> put_flash(:error, "This is forbidden, maybe you want to bypass(f)?")
+    else
+      socket
+      |> push_event("copy-to-clipboard", %{"id" => "copy-#{socket.assigns.script.id}-#{type}"})
+      |> clear_flash()
+      |> put_flash(:info, "Copied as #{type} to clipboard!")
+    end
   end
 
   def fill_variables_to_script(script, loadout) do

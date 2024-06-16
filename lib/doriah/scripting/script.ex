@@ -7,6 +7,7 @@ defmodule Doriah.Scripting.Script do
     field :title, :string
     field :whole_script, :string, default: ""
     field :listed, :boolean
+    field :loadout_required, :boolean
 
     field :status, Ecto.Enum,
       values: [
@@ -35,7 +36,8 @@ defmodule Doriah.Scripting.Script do
       :whole_script,
       :status,
       :deprecated_suggestion_link,
-      :listed
+      :listed,
+      :loadout_required
     ])
     |> validate_required([:title, :description])
   end

@@ -49,40 +49,74 @@
           </span>
         <% end %>
       </:title>
-      <div class="flex flex-col md:flex-row gap-2">
-        <.button
-          class="flex grow gap-4 justify-center"
-          phx-click="copy"
-          phx-value-id={"copy-#{@script.id}"}
-          phx-value-type="curl"
-        >
-          <p class="flex flex-col">
-            <span id={"copy-#{@script.id}-curl"} value={"curl -s #{@script_sh_url} | sh"}>
-              as curl
-            </span>
-            <.controlful_indicator_span char="c" keyboarder={@keyboarder} />
-          </p>
-          <.icon name="hero-clipboard" class="lg:mt-2" />
-        </.button>
 
-        <.button
-          class="flex grow gap-4 justify-center"
-          phx-click="copy"
-          phx-value-id={"copy-#{@script.id}"}
-          phx-value-type="wget"
-        >
-          <p class="flex flex-col">
-            <span id={"copy-#{@script.id}-wget"} value={"wget -qO- #{@script_sh_url} | sh"}>
-              as wget
-            </span>
-            <.controlful_indicator_span char="w" keyboarder={@keyboarder} />
-          </p>
-          <.icon name="hero-clipboard" class="lg:mt-2" />
-        </.button>
-      </div>
-      <div class="bg-zinc-900 text-white p-2 mt-2 rounded-xl flex gap-2 justify-center items-center">
-        <.icon name="hero-information-circle" />Tip: you may add params to the end to override variables(like ?x=y)
-      </div>
+      <%= if(@script.loadout_required && @loadout == nil && !@bypassed) do %>
+        <div class="flex flex-col gap-4 bg-zinc-900 text-white p-4 rounded-xl justify-center items-center">
+          <span class="font-extrabold inline-flex items-center gap-2">
+            Loadout advised by author <.icon name="hero-exclamation-circle" />
+          </span>
+          <button
+            class="bg-white text-zinc-950 rounded-xl p-2 font-bold"
+            phx-click="bypass_advice"
+          >
+            <.controlful_indicator_powered_paragraph
+              name="Bypass?"
+              char="f"
+              keyboarder={@keyboarder}
+            />
+          </button>
+        </div>
+      <% else %>
+        <%= if(@bypassed) do %>
+          <div class="bg-red-900 text-white p-2 my-2 rounded-xl flex gap-2 justify-center items-center font-extrabold">
+            <.icon name="hero-exclamation-triangle" /> Loadout advice bypassed
+            <button
+              class="bg-white text-zinc-950 rounded-xl px-2 py-1 font-bold"
+              phx-click="revert_advice"
+            >
+              <.controlful_indicator_powered_paragraph
+                name="Revert?"
+                char="r"
+                keyboarder={@keyboarder}
+              />
+            </button>
+          </div>
+        <% end %>
+        <div class="flex flex-col md:flex-row gap-2">
+          <.button
+            class="flex grow gap-4 justify-center"
+            phx-click="copy"
+            phx-value-id={"copy-#{@script.id}"}
+            phx-value-type="curl"
+          >
+            <p class="flex flex-col">
+              <span id={"copy-#{@script.id}-curl"} value={"curl -s #{@script_sh_url} | sh"}>
+                as curl
+              </span>
+              <.controlful_indicator_span char="c" keyboarder={@keyboarder} />
+            </p>
+            <.icon name="hero-clipboard" class="lg:mt-2" />
+          </.button>
+
+          <.button
+            class="flex grow gap-4 justify-center"
+            phx-click="copy"
+            phx-value-id={"copy-#{@script.id}"}
+            phx-value-type="wget"
+          >
+            <p class="flex flex-col">
+              <span id={"copy-#{@script.id}-wget"} value={"wget -qO- #{@script_sh_url} | sh"}>
+                as wget
+              </span>
+              <.controlful_indicator_span char="w" keyboarder={@keyboarder} />
+            </p>
+            <.icon name="hero-clipboard" class="lg:mt-2" />
+          </.button>
+        </div>
+        <div class="bg-zinc-900 text-white p-2 mt-2 rounded-xl flex gap-2 justify-center items-center">
+          <.icon name="hero-information-circle" />Tip: you may add params to the end to override variables(like ?x=y)
+        </div>
+      <% end %>
     </.beautiful_section>
 
     <.beautiful_section>

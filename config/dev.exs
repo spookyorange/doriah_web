@@ -2,9 +2,9 @@ import Config
 
 # Configure your database
 config :doriah, Doriah.Repo,
-  username: "spookyorange",
-  password: "spookyorange",
-  hostname: "localhost",
+  username: System.get_env("DB_USER") || "spookyorange",
+  password: System.get_env("DB_PASSWORD") || "spookyorange",
+  hostname: System.get_env("DB_HOST") || "database",
   database: "doriah_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
@@ -19,7 +19,7 @@ config :doriah, Doriah.Repo,
 config :doriah, DoriahWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
-  http: [ip: {127, 0, 0, 1}, port: 4000],
+  http: [ip: {0, 0, 0, 0}, port: 4000],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,

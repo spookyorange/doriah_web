@@ -1,0 +1,34 @@
+version: "3.8"
+
+volumes:
+  db: 
+
+networks:
+  orange:
+
+services:
+  database:
+    image: postgres
+    volumes:
+      - db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: spookyorange
+      POSTGRES_PASSWORD: spookyorange
+    networks:
+      - orange
+
+  app:
+    build:
+      context: .
+    volumes:
+      - .:/app
+    environment:
+      DATABASE_URL: "postgresql://spookyorange:spookyorange@database:5432/"
+      MIX_ENV: dev
+    depends_on:
+      - database
+    command: sh /app/start_dev
+    ports:
+      - "4000:4000"
+    networks:
+      - orange

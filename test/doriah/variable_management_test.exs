@@ -36,14 +36,19 @@ defmodule Doriah.VariableManagementTest do
       loadout = loadout_fixture()
       update_attrs = %{title: "some updated title", variables: %{}}
 
-      assert {:ok, %Loadout{} = loadout} = VariableManagement.update_loadout(loadout, update_attrs)
+      assert {:ok, %Loadout{} = loadout} =
+               VariableManagement.update_loadout(loadout, update_attrs)
+
       assert loadout.title == "some updated title"
       assert loadout.variables == %{}
     end
 
     test "update_loadout/2 with invalid data returns error changeset" do
       loadout = loadout_fixture()
-      assert {:error, %Ecto.Changeset{}} = VariableManagement.update_loadout(loadout, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               VariableManagement.update_loadout(loadout, @invalid_attrs)
+
       assert loadout == VariableManagement.get_loadout!(loadout.id)
     end
 

@@ -92,14 +92,19 @@ defmodule Doriah.ScriptingTest do
       script_line = script_line_fixture()
       update_attrs = %{line_itself: "some updated line_itself", order: 43}
 
-      assert {:ok, %ScriptLine{} = script_line} = Scripting.update_script_line(script_line, update_attrs)
+      assert {:ok, %ScriptLine{} = script_line} =
+               Scripting.update_script_line(script_line, update_attrs)
+
       assert script_line.line_itself == "some updated line_itself"
       assert script_line.order == 43
     end
 
     test "update_script_line/2 with invalid data returns error changeset" do
       script_line = script_line_fixture()
-      assert {:error, %Ecto.Changeset{}} = Scripting.update_script_line(script_line, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Scripting.update_script_line(script_line, @invalid_attrs)
+
       assert script_line == Scripting.get_script_line!(script_line.id)
     end
 
@@ -133,9 +138,15 @@ defmodule Doriah.ScriptingTest do
     end
 
     test "create_script_variable/1 with valid data creates a script_variable" do
-      valid_attrs = %{default_value: "some default_value", key: "some key", purpose: "some purpose"}
+      valid_attrs = %{
+        default_value: "some default_value",
+        key: "some key",
+        purpose: "some purpose"
+      }
 
-      assert {:ok, %ScriptVariable{} = script_variable} = Scripting.create_script_variable(valid_attrs)
+      assert {:ok, %ScriptVariable{} = script_variable} =
+               Scripting.create_script_variable(valid_attrs)
+
       assert script_variable.default_value == "some default_value"
       assert script_variable.key == "some key"
       assert script_variable.purpose == "some purpose"
@@ -147,9 +158,16 @@ defmodule Doriah.ScriptingTest do
 
     test "update_script_variable/2 with valid data updates the script_variable" do
       script_variable = script_variable_fixture()
-      update_attrs = %{default_value: "some updated default_value", key: "some updated key", purpose: "some updated purpose"}
 
-      assert {:ok, %ScriptVariable{} = script_variable} = Scripting.update_script_variable(script_variable, update_attrs)
+      update_attrs = %{
+        default_value: "some updated default_value",
+        key: "some updated key",
+        purpose: "some updated purpose"
+      }
+
+      assert {:ok, %ScriptVariable{} = script_variable} =
+               Scripting.update_script_variable(script_variable, update_attrs)
+
       assert script_variable.default_value == "some updated default_value"
       assert script_variable.key == "some updated key"
       assert script_variable.purpose == "some updated purpose"
@@ -157,14 +175,20 @@ defmodule Doriah.ScriptingTest do
 
     test "update_script_variable/2 with invalid data returns error changeset" do
       script_variable = script_variable_fixture()
-      assert {:error, %Ecto.Changeset{}} = Scripting.update_script_variable(script_variable, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Scripting.update_script_variable(script_variable, @invalid_attrs)
+
       assert script_variable == Scripting.get_script_variable!(script_variable.id)
     end
 
     test "delete_script_variable/1 deletes the script_variable" do
       script_variable = script_variable_fixture()
       assert {:ok, %ScriptVariable{}} = Scripting.delete_script_variable(script_variable)
-      assert_raise Ecto.NoResultsError, fn -> Scripting.get_script_variable!(script_variable.id) end
+
+      assert_raise Ecto.NoResultsError, fn ->
+        Scripting.get_script_variable!(script_variable.id)
+      end
     end
 
     test "change_script_variable/1 returns a script_variable changeset" do

@@ -7,6 +7,7 @@ defmodule Doriah.Scripting do
   alias Doriah.Repo
 
   alias Doriah.Scripting.Script
+  alias Doriah.ScriptingExports.Exports
 
   @doc """
   Returns the list of scripts.
@@ -186,7 +187,13 @@ defmodule Doriah.Scripting do
 
     cooked_variables = put_list_to_map(other_params_as_list)
 
-    fill_content_with_variables(script.whole_script, cooked_variables)
+    script_as_text = fill_content_with_variables(script.whole_script, cooked_variables)
+
+    if(script.loadout_required) do
+      Exports.annotate_script_with_loadout_warning(script_as_text)
+    else
+      script_as_text
+    end
   end
 
   def get_script_as_sh_file_with_loadout(params) do

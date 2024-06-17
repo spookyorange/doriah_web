@@ -55,16 +55,29 @@
           <span class="font-extrabold inline-flex items-center gap-2">
             Loadout advised by author <.icon name="hero-exclamation-circle" />
           </span>
-          <button
-            class="bg-white text-zinc-950 rounded-xl p-2 font-bold"
-            phx-click="bypass_advice"
-          >
-            <.controlful_indicator_powered_paragraph
-              name="Bypass?"
-              char="f"
-              keyboarder={@keyboarder}
-            />
-          </button>
+          <div class="flex flex-col md:flex-row gap-4">
+            <button
+              class="bg-white text-zinc-950 rounded-xl p-2 font-bold"
+              phx-click="bypass_advice"
+            >
+              <.controlful_indicator_powered_paragraph
+                name="Bypass?"
+                char="f"
+                keyboarder={@keyboarder}
+              />
+            </button>
+            <button
+              :if={default_loadout_exists?(@script)}
+              class="bg-white text-zinc-950 rounded-xl p-2 font-bold"
+              phx-click="go_default_loadout"
+            >
+              <.controlful_indicator_powered_paragraph
+                name="Use Default?"
+                char="d"
+                keyboarder={@keyboarder}
+              />
+            </button>
+          </div>
         </div>
       <% else %>
         <%= if(@bypassed) do %>

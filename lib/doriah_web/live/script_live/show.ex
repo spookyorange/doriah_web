@@ -139,6 +139,11 @@ defmodule DoriahWeb.ScriptLive.Show do
     end
   end
 
+  defp default_loadout_exists?(script) do
+    script.default_loadout_codename &&
+      Enum.any?(script.loadouts, fn x -> x.title == script.default_loadout_codename end)
+  end
+
   defp apply_action(socket, :show, _script) do
     socket
   end
@@ -149,6 +154,18 @@ defmodule DoriahWeb.ScriptLive.Show do
 
   defp apply_action(socket, :with_loadout, _script) do
     socket
+  end
+
+  defp apply_action(socket, :initial, script) do
+    if(default_loadout_exists?(script)) do
+      socket
+      |> go_default_loadout(script)
+      |> clear_flash()
+      |> put_flash(:info, "Rerouted: Default loadout found")
+    else
+      socket
+      |> push_patch(to: ~p"/scripts/#{script}")
+    end
   end
 
   @impl true
@@ -164,6 +181,11 @@ defmodule DoriahWeb.ScriptLive.Show do
   @impl true
   def handle_event("revert_advice", _, socket) do
     {:noreply, revert_advice(socket)}
+  end
+
+  @impl true
+  def handle_event("go_default_loadout", _, socket) do
+    {:noreply, go_default_loadout(socket, socket.assigns.script)}
   end
 
   def handle_event("keydown", %{"key" => "e"}, socket) do
@@ -254,10 +276,26 @@ defmodule DoriahWeb.ScriptLive.Show do
     end
   end
 
+  def handle_event("keydown", %{"key" => "d"}, socket) do
+    if socket.assigns.keyboarder &&
+         socket.assigns.live_action == :show do
+      {:noreply,
+       socket
+       |> go_default_loadout(socket.assigns.script)}
+    else
+      {:noreply, socket}
+    end
+  end
+
   use DoriahWeb.BaseUtil.KeyboardSupport
 
   defp bypass_advice(socket) do
     socket |> assign(:bypassed, true)
+  end
+
+  defp go_default_loadout(socket, script) do
+    socket
+    |> push_patch(to: ~p"/scripts/#{script}/with_loadout/#{script.default_loadout_codename}")
   end
 
   defp revert_advice(socket) do
@@ -292,6 +330,7 @@ defmodule DoriahWeb.ScriptLive.Show do
   end
 
   defp page_title(:show), do: "Script - Preview"
+  defp page_title(:initial), do: "Script - Initializing"
   defp page_title(:select_loadout), do: "Script - Select Loadout"
   defp page_title(:with_loadout), do: "Script - Preview With Loadout"
 end

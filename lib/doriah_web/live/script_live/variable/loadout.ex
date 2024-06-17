@@ -272,8 +272,7 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
 
   def handle_event("locked_loadout", %{"loadout-title" => loadout_title}, socket) do
     if socket.assigns.script.loadouts
-       |> Enum.map(fn x -> x.title end)
-       |> Enum.any?(fn y -> y == loadout_title end) do
+       |> Enum.any?(fn x -> x.title == loadout_title end) do
       {:ok, script} =
         Scripting.update_script(
           socket.assigns.script,

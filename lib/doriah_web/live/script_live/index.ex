@@ -50,7 +50,7 @@ defmodule DoriahWeb.ScriptLive.Index do
         <DoriahWeb.ScriptLive.Show.status_symbol status={@script.status} />
       </div>
       <.link
-        patch={~p"/scripts/#{@script}"}
+        patch={~p"/scripts/#{@script}/initial"}
         class="flex align-center gap-2 bg-gray-950 text-white focus-visible:ring-zinc-500 focus-visible:ring-8"
         tabindex="0"
       >

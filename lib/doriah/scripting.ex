@@ -173,6 +173,24 @@ defmodule Doriah.Scripting do
     end
   end
 
+  defp status_annotations(old_list, status) do
+    case status do
+      :under_development ->
+        [:under_development_warning | old_list]
+
+      _ ->
+        old_list
+    end
+  end
+
+  defp push_to_list_if_condition(old_list, new_value, condition) do
+    if condition do
+      [new_value | old_list]
+    else
+      old_list
+    end
+  end
+
   def get_script_as_sh_file(params) do
     script = get_script_with_loadouts!(params["id"])
 
@@ -189,11 +207,14 @@ defmodule Doriah.Scripting do
 
     script_as_text = fill_content_with_variables(script.whole_script, cooked_variables)
 
-    if(script.loadout_required) do
-      Exports.annotate_script_with_loadout_warning(script_as_text)
-    else
-      script_as_text
-    end
+    annotations =
+      []
+      |> push_to_list_if_condition(:loadout_required_warning, script.loadout_required)
+      |> status_annotations(script.status)
+
+    IO.inspect(annotations)
+
+    annotate_script(script_as_text, annotations)
   end
 
   def get_script_as_sh_file_with_loadout(params) do
@@ -216,6 +237,10 @@ defmodule Doriah.Scripting do
     cooked_variables = put_list_to_map(other_params_as_list, half_baked_variables)
 
     fill_content_with_variables(script.whole_script, cooked_variables)
+  end
+
+  defp annotate_script(script_as_text, annotations) do
+    Exports.annotate(script_as_text, annotations)
   end
 
   def standardize_variables(variables) do

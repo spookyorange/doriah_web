@@ -30,6 +30,21 @@
 
 <div class="my-8 flex flex-col">
   <div class="flex flex-col gap-4">
+    <.beautiful_section>
+      <:title>
+        Default Loadout Codename = <%= @script.default_loadout_codename || "-" %>
+      </:title>
+      <div class="flex items-center justify-center">
+        <.button phx-click="select_default_modal">
+          <.controlful_indicator_powered_paragraph
+            name="Change"
+            char="c"
+            keyboarder={@keyboarder}
+          />
+        </.button>
+      </div>
+    </.beautiful_section>
+
     <h3 class="text-xl font-medium">
       Currently applied loadout:
       <span class="font-extrabold"><%= @currently_applied_loadout_title %></span>
@@ -190,6 +205,38 @@
       </p>
     </div>
   </div>
+
+  <.modal
+    :if={@live_action == :select_default}
+    id="script-loadout-select-default-modal"
+    show
+    on_cancel={JS.patch(~p"/scripts/#{@script}/variable_loadout")}
+  >
+    <.header>
+      Select the default loadout
+      <:subtitle>
+        Select the default one, quick!
+      </:subtitle>
+    </.header>
+
+    <div class="flex flex-col gap-4 mt-4">
+      <.button
+        class="flex rounded-xl bg-red-800 text-white focus-visible:ring-zinc-500 focus-visible:ring-8 justify-center hover:bg-red-600"
+        phx-click="clear_default_loadout"
+      >
+        Clear(none)
+      </.button>
+
+      <.button
+        :for={loadout <- @script.loadouts}
+        class="flex rounded-xl bg-gray-950 text-white focus-visible:ring-zinc-500 focus-visible:ring-8 justify-center"
+        phx-value-loadout-title={loadout.title}
+        phx-click="locked_loadout"
+      >
+        <%= loadout.title %>
+      </.button>
+    </div>
+  </.modal>
 
   <.modal
     :if={@live_action == :load_out}

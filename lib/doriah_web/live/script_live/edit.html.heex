@@ -39,6 +39,23 @@
 
 <div class="my-8 flex flex-col gap-2">
   <DoriahWeb.ScriptLive.Show.status_indicator script={@script} />
+  <.beautiful_section :if={@script.default_loadout_codename}>
+    <:title>Default Loadout Codename = <%= @script.default_loadout_codename %></:title>
+    <div class="bg-zinc-900 text-white p-2 mt-2 rounded-xl flex flex-col md:flex-row gap-4 justify-center items-center grow">
+      <.icon name="hero-information-circle" /> Tip: You may change it from
+      <.link
+        patch={~p"/scripts/#{@script}/variable_loadout"}
+        phx-click={JS.push_focus()}
+        class="underline"
+      >
+        <.controlful_indicator_powered_paragraph
+          name="Variable Loadout Management"
+          char="v"
+          keyboarder={@keyboarder}
+        />
+      </.link>
+    </div>
+  </.beautiful_section>
   <.beautiful_section :if={@script.status == :deprecated}>
     <:title>Deprecation Specials!</:title>
     <div class="flex flex-col gap-4 items-center">

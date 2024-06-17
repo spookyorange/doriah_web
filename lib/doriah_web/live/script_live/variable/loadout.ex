@@ -80,6 +80,10 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
     socket
   end
 
+  defp apply_action(socket, :select_default, _script) do
+    socket
+  end
+
   defp apply_action(socket, :load_out, _script) do
     socket
   end
@@ -228,6 +232,11 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
     |> put_flash(:info, "Loadout successfully updated in the database")
   end
 
+  defp navigate_to_default_loadout_selection(socket) do
+    socket
+    |> push_navigate(to: ~p"/scripts/#{socket.assigns.script}/variable_loadout/select_default")
+  end
+
   def handle_event("create_new_variable", _, socket) do
     {:noreply,
      socket
@@ -261,6 +270,47 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
      |> apply_variables_from_ram_to_current()}
   end
 
+  def handle_event("locked_loadout", %{"loadout-title" => loadout_title}, socket) do
+    if socket.assigns.script.loadouts
+       |> Enum.map(fn x -> x.title end)
+       |> Enum.any?(fn y -> y == loadout_title end) do
+      {:ok, script} =
+        Scripting.update_script(
+          socket.assigns.script,
+          %{
+            default_loadout_codename: loadout_title
+          }
+        )
+
+      {:noreply,
+       socket
+       |> push_patch(to: ~p"/scripts/#{script}/variable_loadout")
+       |> clear_flash()
+       |> put_flash(:info, "New default loadout: #{loadout_title}")}
+    else
+      {:noreply,
+       socket
+       |> clear_flash()
+       |> put_flash(:error, "No such loadout with specified codename found")}
+    end
+  end
+
+  def handle_event("clear_default_loadout", _, socket) do
+    {:ok, script} =
+      Scripting.update_script(
+        socket.assigns.script,
+        %{
+          default_loadout_codename: nil
+        }
+      )
+
+    {:noreply,
+     socket
+     |> push_patch(to: ~p"/scripts/#{script}/variable_loadout")
+     |> clear_flash()
+     |> put_flash(:info, "Cleared defualt loadout")}
+  end
+
   def handle_event("save_loadout", %{"new_loadout" => %{"title" => loadout_title}}, socket) do
     {:noreply,
      socket
@@ -283,11 +333,27 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
      |> put_flash(:info, "Loadout deleted successfully")}
   end
 
+  def handle_event("select_default_modal", _, socket) do
+    {:noreply,
+     socket
+     |> navigate_to_default_loadout_selection()}
+  end
+
   def handle_event("keydown", %{"key" => "b"}, socket) do
     if socket.assigns.keyboarder && socket.assigns.live_action == :variable_loadout do
       {:noreply,
        socket
        |> push_navigate(to: ~p"/scripts/#{socket.assigns.script}")}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("keydown", %{"key" => "c"}, socket) do
+    if socket.assigns.keyboarder && socket.assigns.live_action == :variable_loadout do
+      {:noreply,
+       socket
+       |> navigate_to_default_loadout_selection()}
     else
       {:noreply, socket}
     end
@@ -368,6 +434,7 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
   use KeyboardSupport
 
   defp page_title(:variable_loadout), do: "Script - Variable Loadouts"
+  defp page_title(:select_default), do: "Script - Select the default Loadout"
   defp page_title(:load_out), do: "Script - Load Loadout"
   defp page_title(:delete_loadout), do: "Script - Delete a Loadout"
 end

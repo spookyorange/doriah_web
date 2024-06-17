@@ -38,9 +38,29 @@
 <.controlful_panel controlful={@controlful} keyboarder={@keyboarder} />
 
 <div class="my-8 flex flex-col gap-2">
-  <DoriahWeb.ScriptLive.Show.status_indicator script={@script} />
-  <.beautiful_section :if={@script.default_loadout_codename}>
-    <:title>Default Loadout Codename = <%= @script.default_loadout_codename %></:title>
+  <.beautiful_section>
+    <:title>
+      Status
+    </:title>
+    <div class="flex flex-col gap-2">
+      <div class="flex justify-center items-center gap-2">
+        Current Status: <%= Scripting.status_name_to_displayable_name(@script.status) %>
+        <DoriahWeb.ScriptLive.Show.status_symbol status={@script.status} />
+      </div>
+      <.link class="w-full" patch={~p"/scripts/#{@script}/edit_mode/change_status"}>
+        <.button class="w-full">
+          <.controlful_indicator_powered_paragraph
+            name="Change Status"
+            char="c"
+            keyboarder={@keyboarder}
+          />
+        </.button>
+      </.link>
+    </div>
+  </.beautiful_section>
+
+  <.beautiful_section>
+    <:title>Default Loadout Codename = <%= @script.default_loadout_codename || "-" %></:title>
     <div class="bg-zinc-900 text-white p-2 mt-2 rounded-xl flex flex-col md:flex-row gap-4 justify-center items-center grow">
       <.icon name="hero-information-circle" /> Tip: You may change it from
       <.link

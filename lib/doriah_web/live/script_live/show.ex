@@ -18,7 +18,7 @@ defmodule DoriahWeb.ScriptLive.Show do
       <:title>
         Status
       </:title>
-      <div class="flex w-full justify-center gap-2">
+      <div class="flex w-full justify-center items-center gap-2">
         <p>
           <%= Scripting.status_name_to_displayable_name(@script.status) %>
         </p>

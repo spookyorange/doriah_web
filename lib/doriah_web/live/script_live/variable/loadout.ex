@@ -34,7 +34,9 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
          |> assign(:saveable, false)
          |> apply_action(socket.assigns.live_action, script)}
       rescue
-        _ ->
+        error ->
+          IO.inspect(error)
+
           {:noreply,
            socket
            |> push_navigate(to: ~p"/scripts/#{script}/variable_loadout")
@@ -214,7 +216,7 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
       })
 
     socket
-    |> push_patch(to: ~p"/scripts/#{socket.assigns.script.id}/variable_loadout/#{loadout.id}")
+    |> push_patch(to: ~p"/scripts/#{socket.assigns.script.id}/variable_loadout/#{loadout.title}")
     |> put_flash(:info, "Loadout successfully saved to database")
   end
 
@@ -228,7 +230,7 @@ defmodule DoriahWeb.ScriptLive.Variable.Loadout do
       })
 
     socket
-    |> push_patch(to: ~p"/scripts/#{socket.assigns.script.id}/variable_loadout/#{loadout.id}")
+    |> push_patch(to: ~p"/scripts/#{socket.assigns.script.id}/variable_loadout/#{loadout.title}")
     |> put_flash(:info, "Loadout successfully updated in the database")
   end
 

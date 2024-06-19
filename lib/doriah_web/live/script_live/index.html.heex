@@ -17,6 +17,66 @@
     </.link>
   </:actions>
 </.header>
+<div class="mt-4">
+  <.beautiful_section>
+    <:title>
+      <p class="flex items-center justify-center gap-4" phx-click="switch_filter_dropdown">
+        <span>Filters <.controlful_indicator_span char="f" keyboarder={@keyboarder} /></span>
+        <.icon :if={!@filter_selector_on} name="hero-chevron-double-down" />
+        <.icon :if={@filter_selector_on} name="hero-chevron-double-up" />
+      </p>
+    </:title>
+    <div :if={@filter_selector_on} class="flex flex-col items-center">
+      <div class="flex flex-wrap gap-2 justify-center mt-4">
+        <%= for status <- @filterable_statuses do %>
+          <.inactive_pill_style_button
+            :if={!(status in @to_be_applied_statuses)}
+            phx-value-to="true"
+            phx-value-status={status}
+            phx-click="switch_status"
+          >
+            <%= Scripting.status_name_to_displayable_name(status) %>
+          </.inactive_pill_style_button>
+          <.active_pill_style_button
+            :if={status in @to_be_applied_statuses}
+            phx-value-to="false"
+            phx-value-status={status}
+            phx-click="switch_status"
+          >
+            <%= Scripting.status_name_to_displayable_name(status) %>
+          </.active_pill_style_button>
+        <% end %>
+      </div>
+      <div class="flex flex-col items-center my-4 gap-2">
+        <p class="underline">
+          Also, they must be
+        </p>
+        <div :for={switchable <- @switchable_categories}>
+          <%= if !(switchable in @to_be_applied_switchables) do %>
+            <.inactive_pill_style_button
+              phx-value-to="true"
+              phx-value-switchable={switchable}
+              phx-click="switch_switchable"
+            >
+              <%= switchable |> Atom.to_string() |> String.capitalize() %>
+            </.inactive_pill_style_button>
+          <% else %>
+            <.active_pill_style_button
+              phx-value-to="false"
+              phx-value-switchable={switchable}
+              phx-click="switch_switchable"
+            >
+              <%= switchable |> Atom.to_string() |> String.capitalize() %>
+            </.active_pill_style_button>
+          <% end %>
+        </div>
+      </div>
+      <.button class="w-full rounded-xl" phx-click="apply_filters">
+        <.controlful_indicator_powered_paragraph name="Apply" char="a" keyboarder={@keyboarder} />
+      </.button>
+    </div>
+  </.beautiful_section>
+</div>
 
 <.controlful_panel controlful={@controlful} keyboarder={@keyboarder} />
 

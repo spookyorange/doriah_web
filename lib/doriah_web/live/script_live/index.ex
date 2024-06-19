@@ -5,9 +5,63 @@ defmodule DoriahWeb.ScriptLive.Index do
   alias Doriah.Scripting
   alias Doriah.Scripting.Script
 
+  defp split_atoms_to_strings(list) do
+    list
+    |> Enum.map(fn x -> String.to_atom(x) end)
+  end
+
+  defp list_or_singular(list, singular) do
+    if length(list) == 0 do
+      [singular]
+    else
+      list
+    end
+  end
+
+  defp get_statuses_from_params(params) do
+    all_possible_statuses = Scripting.all_statuses_atoms()
+
+    from_params =
+      get_stuff_from_params(params, "statuses")
+      |> split_atoms_to_strings()
+      |> Enum.filter(fn x -> x in all_possible_statuses end)
+
+    list_or_singular(from_params, :stable)
+  end
+
+  defp get_switchables_from_params(params) do
+    from_params =
+      get_stuff_from_params(params, "switchables") |> split_atoms_to_strings()
+
+    list_or_singular(from_params, :listed)
+  end
+
+  defp get_stuff_from_params(params, name) do
+    if params[name] do
+      String.split(params[name], ",")
+    else
+      []
+    end
+  end
+
   @impl true
-  def mount(_params, _session, socket) do
-    {:ok, assign(socket, :scripts, Scripting.list_scripts()) |> assign_controlful()}
+  def mount(params, _session, socket) do
+    statuses = get_statuses_from_params(params)
+    switchables = get_switchables_from_params(params)
+
+    {:ok,
+     assign(
+       socket,
+       :scripts,
+       Scripting.list_scripts(statuses, switchables)
+     )
+     |> assign_controlful()
+     |> assign(:filterable_statuses, filterable_statuses())
+     |> assign(:switchable_categories, switchable_categories())
+     |> assign(:to_be_applied_statuses, statuses)
+     |> assign(:to_be_applied_switchables, switchables)
+     |> assign(:applied_statuses, statuses)
+     |> assign(:applied_switchables, switchables)}
   end
 
   @impl true
@@ -19,6 +73,7 @@ defmodule DoriahWeb.ScriptLive.Index do
     socket
     |> assign(:page_title, "Scripts")
     |> assign(:script, nil)
+    |> assign(:filter_selector_on, false)
   end
 
   defp apply_action(socket, :new, _params) do
@@ -60,6 +115,56 @@ defmodule DoriahWeb.ScriptLive.Index do
     """
   end
 
+  defp filterable_statuses() do
+    Scripting.all_statuses_atoms()
+  end
+
+  defp switchable_categories() do
+    [
+      :listed
+    ]
+  end
+
+  defp switch_filter_dropdown(socket) do
+    socket |> assign(:filter_selector_on, !socket.assigns.filter_selector_on)
+  end
+
+  def handle_event("switch_switchable", %{"switchable" => switchable, "to" => to}, socket) do
+    if to == "true" do
+      with_switchable =
+        [switchable |> String.to_atom() | socket.assigns.to_be_applied_switchables] |> Enum.uniq()
+
+      {:noreply, socket |> assign(:to_be_applied_switchables, with_switchable)}
+    else
+      without_switchable =
+        socket.assigns.to_be_applied_switchables |> List.delete(switchable |> String.to_atom())
+
+      {:noreply, socket |> assign(:to_be_applied_switchables, without_switchable)}
+    end
+  end
+
+  def handle_event("switch_status", %{"status" => status, "to" => to}, socket) do
+    if to == "true" do
+      with_status =
+        [status |> String.to_atom() | socket.assigns.to_be_applied_statuses] |> Enum.uniq()
+
+      {:noreply, socket |> assign(:to_be_applied_statuses, with_status)}
+    else
+      without_status =
+        socket.assigns.to_be_applied_statuses |> List.delete(status |> String.to_atom())
+
+      {:noreply, socket |> assign(:to_be_applied_statuses, without_status)}
+    end
+  end
+
+  def handle_event("switch_filter_dropdown", _, socket) do
+    {:noreply, switch_filter_dropdown(socket)}
+  end
+
+  def handle_event("apply_filters", _, socket) do
+    {:noreply, socket |> apply_filters()}
+  end
+
   def handle_event("keydown", %{"key" => "n"}, socket) do
     if socket.assigns.keyboarder do
       {:noreply,
@@ -80,5 +185,56 @@ defmodule DoriahWeb.ScriptLive.Index do
     end
   end
 
+  def handle_event("keydown", %{"key" => "f"}, socket) do
+    if socket.assigns.keyboarder do
+      {:noreply,
+       socket
+       |> switch_filter_dropdown()}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("keydown", %{"key" => "a"}, socket) do
+    if socket.assigns.keyboarder && socket.assigns.filter_selector_on do
+      {:noreply,
+       socket
+       |> apply_filters()}
+    else
+      {:noreply, socket}
+    end
+  end
+
   use DoriahWeb.BaseUtil.KeyboardSupport
+
+  defp apply_filters(socket) do
+    statuses = socket.assigns.to_be_applied_statuses
+    switchables = socket.assigns.to_be_applied_switchables
+
+    socket
+    |> push_patch(to: generate_url_with_filters(socket))
+    |> assign(:applied_statuses, statuses)
+    |> assign(:applied_switchables, switchables)
+    |> assign(:scripts, Scripting.list_scripts(statuses, switchables))
+    |> clear_flash()
+    |> put_flash(:info, "Filters applied successfully!")
+  end
+
+  defp concat_as_param(list) do
+    list
+    |> Enum.map(fn x -> Atom.to_string(x) end)
+    |> Enum.join(",")
+  end
+
+  defp generate_url_with_filters(socket) do
+    statuses =
+      socket.assigns.to_be_applied_statuses
+      |> concat_as_param()
+
+    switchables =
+      socket.assigns.to_be_applied_switchables
+      |> concat_as_param()
+
+    ~p"/scripts?statuses=#{statuses}&switchables=#{switchables}"
+  end
 end

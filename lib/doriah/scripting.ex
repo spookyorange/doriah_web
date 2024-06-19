@@ -18,8 +18,19 @@ defmodule Doriah.Scripting do
       [%Script{}, ...]
 
   """
-  def list_scripts do
-    Repo.all(from s in Script, where: s.listed == true, order_by: [desc: s.inserted_at])
+  def list_scripts(statuses \\ [], switchables \\ []) do
+    listed_condition_from_list = :listed in switchables
+
+    listed_conditions = [
+      true,
+      listed_condition_from_list
+    ]
+
+    Repo.all(
+      from s in Script,
+        where: s.status in ^statuses and s.listed in ^listed_conditions,
+        order_by: [desc: s.inserted_at]
+    )
   end
 
   @doc """
@@ -212,8 +223,6 @@ defmodule Doriah.Scripting do
       |> push_to_list_if_condition(:loadout_required_warning, script.loadout_required)
       |> status_annotations(script.status)
 
-    IO.inspect(annotations)
-
     annotate_script(script_as_text, annotations)
   end
 
@@ -353,5 +362,16 @@ defmodule Doriah.Scripting do
       :just_imported -> "Just Imported"
       _ -> "Unknown"
     end
+  end
+
+  def all_statuses_atoms do
+    [
+      :under_development,
+      :untested_usable,
+      :stable,
+      :deprecated,
+      :discounted,
+      :just_imported
+    ]
   end
 end

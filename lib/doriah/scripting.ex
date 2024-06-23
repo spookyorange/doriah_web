@@ -223,7 +223,7 @@ defmodule Doriah.Scripting do
       |> push_to_list_if_condition(:loadout_required_warning, script.loadout_required)
       |> status_annotations(script.status)
 
-    annotate_script(script_as_text, annotations)
+    annotate_script(script, script_as_text, annotations)
   end
 
   def get_script_as_sh_file_with_loadout(params) do
@@ -251,11 +251,11 @@ defmodule Doriah.Scripting do
       []
       |> status_annotations(script.status)
 
-    annotate_script(script_as_text, annotations)
+    annotate_script(script, script_as_text, annotations)
   end
 
-  defp annotate_script(script_as_text, annotations) do
-    Exports.annotate(script_as_text, annotations)
+  defp annotate_script(script, script_as_text, annotations) do
+    Exports.annotate(script, script_as_text, annotations)
   end
 
   def standardize_variables(variables) do

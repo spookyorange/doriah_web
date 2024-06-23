@@ -245,7 +245,13 @@ defmodule Doriah.Scripting do
 
     cooked_variables = put_list_to_map(other_params_as_list, half_baked_variables)
 
-    fill_content_with_variables(script.whole_script, cooked_variables)
+    script_as_text = fill_content_with_variables(script.whole_script, cooked_variables)
+
+    annotations =
+      []
+      |> status_annotations(script.status)
+
+    annotate_script(script_as_text, annotations)
   end
 
   defp annotate_script(script_as_text, annotations) do

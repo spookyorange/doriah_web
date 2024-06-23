@@ -103,7 +103,7 @@
             phx-value-type="curl"
           >
             <p class="flex flex-col">
-              <span id={"copy-#{@script.id}-curl"} value={"curl -s #{@script_sh_url} | sh"}>
+              <span id={"copy-#{@script.id}-curl"} value={"sh <(curl -s #{@script_sh_url})"}>
                 as curl
               </span>
               <.controlful_indicator_span char="c" keyboarder={@keyboarder} />
@@ -118,7 +118,7 @@
             phx-value-type="wget"
           >
             <p class="flex flex-col">
-              <span id={"copy-#{@script.id}-wget"} value={"wget -qO- #{@script_sh_url} | sh"}>
+              <span id={"copy-#{@script.id}-wget"} value={"sh <(wget -qO- #{@script_sh_url})"}>
                 as wget
               </span>
               <.controlful_indicator_span char="w" keyboarder={@keyboarder} />

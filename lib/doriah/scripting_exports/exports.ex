@@ -19,23 +19,43 @@ defmodule Doriah.ScriptingExports.Exports do
     end
   end
 
-  def annotate_script_with_loadout_warning(script) do
+  defp annotate_script_with_loadout_warning(script) do
     """
     echo "Warning, you are running a script that is adviced to be used with a loadout, without a loadout"
-    echo "3 second penalty to think this over"
-    sleep 3
+
+    #{are_you_sure_prompt()}
 
     #{script}
     """
   end
 
-  def annotate_script_with_development_warning(script) do
+  defp annotate_script_with_development_warning(script) do
     """
     echo "Warning, you are running a script that is flagged as under development"
-    echo "2 second penalty to think this over"
-    sleep 2
+
+    #{are_you_sure_prompt()}
 
     #{script}
+    """
+  end
+
+  defp are_you_sure_prompt() do
+    """
+
+    read -p "Are you sure you want this?(y/[any key to cancel]): " answer
+
+    if [ "$answer" = "y" ]; then
+      sleep 1
+      echo
+      echo "Positivity acknowledged, continuing on..."
+    else
+      sleep 1
+      echo "You did not answer positively, cancelling the process"
+      exit 1
+    fi
+
+    echo
+
     """
   end
 end
